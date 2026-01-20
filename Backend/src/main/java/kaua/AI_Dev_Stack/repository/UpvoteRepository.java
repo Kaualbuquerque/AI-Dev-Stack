@@ -1,9 +1,12 @@
 package kaua.AI_Dev_Stack.repository;
 
+import kaua.AI_Dev_Stack.model.Resource;
 import kaua.AI_Dev_Stack.model.Upvote;
+import kaua.AI_Dev_Stack.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -17,4 +20,5 @@ public interface UpvoteRepository extends JpaRepository<Upvote, UUID> {
 
     // 3. Para deletar o voto (caso o usuário queira desfazer o upvote)
     void deleteByUserIdAndResourceId(UUID userId, UUID resourceId);
+
 }
