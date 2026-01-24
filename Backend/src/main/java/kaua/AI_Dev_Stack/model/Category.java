@@ -28,6 +28,9 @@ public class Category {
     @Column(unique = true, nullable = false, length = 50)
     private String name;
 
+    @Column(unique = true)
+    private String slug;
+
     @Column(name = "icon_key", length = 30)
     private String iconKey;
 

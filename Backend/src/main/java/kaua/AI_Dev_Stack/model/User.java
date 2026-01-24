@@ -43,7 +43,7 @@ public class User {
 
     @NotNull(message = "User role is required")
     @Enumerated(EnumType.STRING) // Salva como "ADMIN" ou "USER" no Postgres
-    private UserRole role;
+    private UserRole role = UserRole.USER;
 
     @CreationTimestamp
     @Column(updatable = false)

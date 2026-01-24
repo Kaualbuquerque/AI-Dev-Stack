@@ -1,45 +1,54 @@
 package kaua.AI_Dev_Stack.service;
 
+import kaua.AI_Dev_Stack.dto.request.ResourceRequestDTO;
+import kaua.AI_Dev_Stack.mapper.ResourceMapper;
+import kaua.AI_Dev_Stack.model.Category;
 import kaua.AI_Dev_Stack.model.Resource;
+import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.repository.CategoryRepository;
 import kaua.AI_Dev_Stack.repository.ResourceRepository;
+import kaua.AI_Dev_Stack.utils.SlugUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
-import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final CategoryRepository categoryRepository;
+    private final TagService tagService;
+    private final ResourceMapper resourceMapper;
 
-    public ResourceService(ResourceRepository resourceRepository, CategoryRepository categoryRepository) {
+    public ResourceService(ResourceRepository resourceRepository, CategoryRepository categoryRepository, TagService tagService, ResourceMapper resourceMapper) {
         this.resourceRepository = resourceRepository;
         this.categoryRepository = categoryRepository;
+        this.tagService = tagService;
+        this.resourceMapper = resourceMapper;
     }
 
     @Transactional
-    public Resource save(Resource resource) {
-        // 1. Gerar o Slug a partir do título
-        String slug = generateSlug(resource.getTitle());
+    public Resource save(ResourceRequestDTO dto) {
+        // 1. Buscar a Categoria (Não existe IA sem categoria)
+        Category category = categoryRepository.findById(dto.categoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + dto.categoryId()));
+
+        Set<Tag> managedTags = (dto.tags() == null) ? Set.of() :
+                dto.tags().stream()
+                        .map(tagService::findOrCreate)
+                        .collect(Collectors.toSet());
+
+        // 2. Entrega tudo pronto para o Mapper converter
+        Resource resource = resourceMapper.toEntity(dto, category, managedTags);
+
+        String slug = SlugUtils.generateSlug(dto.title());
         resource.setSlug(slug);
-
-        // 2. Validar se o Slug já existe (Regra de Negócio)
-        if (resourceRepository.findBySlugIgnoreCase(slug).isPresent()) {
-            throw new RuntimeException("There is already a resource with a similar title (Duplicate Slug).");
-        }
-
-        // 3. Validar se a categoria associada existe
-        if (resource.getCategory() != null && resource.getCategory().getId() != null) {
-            categoryRepository.findById(resource.getCategory().getId())
-                    .orElseThrow(() -> new RuntimeException("The category provided does not exist."));
-        }
 
         return resourceRepository.save(resource);
     }
@@ -47,25 +56,5 @@ public class ResourceService {
     @Transactional(readOnly = true)
     public Page<Resource> findAllApproved(Pageable pageable) {
         return resourceRepository.findByIsApprovedTrue(pageable);
-    }
-
-    private String generateSlug(String title) {
-        if (title == null) return "";
-
-        // 1. Transforma em minúsculo
-        String base = title.toLowerCase().trim();
-
-        // 2. Normaliza (Separa o caractere do acento, ex: 'á' vira 'a' + '´')
-        String normalize = Normalizer.normalize(base, Normalizer.Form.NFD);
-
-        // 3. Usa Regex para remover os acentos (combining marks)
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String wihtoutAccents = pattern.matcher(normalize).replaceAll("");
-
-        // 4. Remove qualquer coisa que não seja letra, número ou espaço, e troca espaços por hífens
-        return wihtoutAccents
-                .replaceAll("[^a-z0-9\\s]", "")
-                .replaceAll("\\s+", "-")
-                .replaceAll("-+", "-"); // Evita múltiplos hífens seguidos
     }
 }

@@ -9,6 +9,5 @@ public class AiDevStackApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AiDevStackApplication.class, args);
-
 	}
 }
