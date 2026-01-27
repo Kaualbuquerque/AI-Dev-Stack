@@ -30,8 +30,6 @@ public class Tag {
 
     // Relacionamentos
 
-    @NotNull(message = "Resource is required for upvoting")
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
-    @JoinColumn(name = "resource_id", nullable = false)
     private Set<Resource> resources = new HashSet<>();
 }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,7 +25,7 @@ public class CategoryService {
 
     @Transactional
     public Category save(CategoryRequestDTO dto) {
-        if (categoryRepository.existsByCategory(dto.name())) {
+        if (categoryRepository.existsByName(dto.name())) {
             throw new RuntimeException("Category with name " + dto.name() + " already exists.");
         }
 
