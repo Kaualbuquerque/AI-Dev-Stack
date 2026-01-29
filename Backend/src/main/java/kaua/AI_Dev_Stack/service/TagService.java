@@ -1,8 +1,11 @@
 package kaua.AI_Dev_Stack.service;
 
+import kaua.AI_Dev_Stack.exceptions.DatabaseException;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.repository.TagRepository;
 import kaua.AI_Dev_Stack.utils.TagProjection;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,9 +55,13 @@ public class TagService {
 
     @Transactional
     public void delete(UUID id) {
-        if (tagRepository.countResourcesByTagId(id) > 0) {
-            throw new RuntimeException("Cannot delete tag: it is being used by one or more resources.");
+        if (!tagRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Tag not found with ID: " + id);
         }
-        tagRepository.deleteById(id);
+        try {
+            tagRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Cannot delete tag: it is associated with existing AI resources.");
+        }
     }
 }
