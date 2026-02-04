@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Na v4, as variáveis de tema e animações são feitas aqui */
+@theme {
+  --color-background: hsl(222.2 84% 4.9%);
+  --color-foreground: hsl(210 40% 98%);
+
+  --color-primary: hsl(187 94% 43%);
+  --color-primary-foreground: hsl(222.2 84% 4.9%);
+
+  /* Definindo a animação direto no tema */
+  --keyframes-gradient-shift: {
+
+    0%,
+    100% {
+      background-position: 0% center;
+    }
+
+    50% {
+      background-position: 100% center;
+    }
+  }
+
+  ;
+  --animation-gradient-shift: gradient-shift 3s ease infinite;
+}
+
+/* Para criar suas classes utilitárias personalizadas (antigo @layer components) */
+@utility glass-effect {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@utility gradient-text {
+  background: linear-gradient(135deg, #06B6D4 0%, #A855F7 50%, #06B6D4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: var(--animation-gradient-shift);
+}
+
+@utility glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+/* Estilo global do body */
+@layer base {
+  body {
+    background-color: #0F172A;
+    color: var(--color-foreground);
+  }
+}

@@ -10,7 +10,7 @@ public class AiDevStackApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AiDevStackApplication.class, args);
 
-		System.out.println("Servidor rodando!!");
+		System.out.println("Servidor rodando: http://localhost:8081/swagger-ui");
 
 	}
 }

@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum PricingType {
-    FREE("Gratuito"),
-    FREEMIUM("Freemium"),
-    PAID("Pago");
+    FREE("FREE"),
+    FREEMIUM("FREEMIUN"),
+    PAID("PAID");
 
     private final String displayValue;
 
