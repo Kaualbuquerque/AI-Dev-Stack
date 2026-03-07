@@ -52,7 +52,7 @@ public class User {
     // Relacionamentos
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Resource> suggestedResources = new ArrayList<>();
+    private List<Tool> suggestedTools = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Upvote> upvotes = new ArrayList<>();

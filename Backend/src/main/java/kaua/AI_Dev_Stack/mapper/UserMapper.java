@@ -31,7 +31,7 @@ public class UserMapper {
         Set<UUID> upvotedResourceIds = Optional.ofNullable(user.getUpvotes())
                 .orElse(Collections.emptyList()) // Garante uma lista vazia se for null
                 .stream()
-                .map(upvote -> upvote.getResource().getId())
+                .map(upvote -> upvote.getTool().getId())
                 .collect(Collectors.toSet());
 
         return new UserResponseDTO(

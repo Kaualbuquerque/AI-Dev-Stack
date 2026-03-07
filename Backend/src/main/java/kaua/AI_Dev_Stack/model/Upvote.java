@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(
         name = "upvotes",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "resource_id"})
+                @UniqueConstraint(columnNames = {"user_id", "tool_id"})
         })
 @Getter
 @Setter
@@ -40,6 +40,6 @@ public class Upvote {
 
     @NotNull(message = "Resource is required for upvoting")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resource_id")
-    private Resource resource;
+    @JoinColumn(name = "tool_id")
+    private Tool tool;
 }

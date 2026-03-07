@@ -13,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/upvotes")
 @Tag(
-        name = "upvoutes",
+        name = "upvotes",
         description = "Engagement and popularity management. Allows users to boost AI tools, directly influencing their ranking and visibility within the directory")
 public class UpvoteController {
 

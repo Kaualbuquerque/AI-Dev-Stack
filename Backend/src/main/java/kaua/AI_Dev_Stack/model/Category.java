@@ -1,6 +1,7 @@
 package kaua.AI_Dev_Stack.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,8 @@ public class Category {
     // Relacionamentos
 
     // Relacionamento bidirecional: permite buscar recursos a partir da categoria
-    // mappedBy deve ter o mesmo nome do atributo 'category' dentro da classe Resource
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Resource> resources = new ArrayList<>();
+    // O 'mappedBy' indica que o lado "dono" do relacionamento é a Tool.
+    @ManyToMany(mappedBy = "categories")
+    @JsonIgnore // Importante para evitar o loop infinito no JSON que você mencionou
+    private List<Tool> tools = new ArrayList<>();
 }

@@ -1,6 +1,8 @@
 package kaua.AI_Dev_Stack.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,5 +51,21 @@ public class UserController {
         UserResponseDTO response = userMapper.toResponseDTO(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "Find user by email",
+            description = "Returns the details of a specific user based on the provided email address. " +
+                    "This endpoint is useful for frontend user verification."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User found successfully"),
+            @ApiResponse(responseCode = "404", description = "No user found with the provided email"),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing email parameter")
+    })
+    public ResponseEntity<UserResponseDTO> findByEmail(@RequestParam String email) {
+        User user = userService.findByEmail(email);
+        return ResponseEntity.ok(userMapper.toResponseDTO(user));
     }
 }

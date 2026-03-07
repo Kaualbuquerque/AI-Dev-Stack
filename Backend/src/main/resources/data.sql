@@ -1,33 +1,44 @@
--- 1. Inserir Categorias
 INSERT INTO categories (id, name, slug, icon_key)
-VALUES (gen_random_uuid(), 'Backend', 'backend', 'layout'),
-       (gen_random_uuid(), 'Frontend', 'frontend', 'layout'),
-       (gen_random_uuid(), 'Inteligência Artificial', 'ai-tools', 'layout');
+VALUES (gen_random_uuid(), 'Code Gen', 'code-gen', 'code'),
+       (gen_random_uuid(), 'UI', 'ui', 'layout'),
+       (gen_random_uuid(), 'React', 'react', 'atom'),
+       (gen_random_uuid(), 'Copilots', 'copilots', 'bot'),
+       (gen_random_uuid(), 'IDE', 'ide', 'terminal'),
+       (gen_random_uuid(), 'Data Science', 'data-science', 'database'),
+       (gen_random_uuid(), 'LLMs', 'llms', 'brain'),
+       (gen_random_uuid(), 'ML', 'ml', 'cpu'),
+       (gen_random_uuid(), 'Terminal', 'terminal', 'command'),
+       (gen_random_uuid(), 'Productivity', 'productivity', 'zap'),
+       (gen_random_uuid(), 'Chatbots', 'chatbots', 'message-square'),
+       (gen_random_uuid(), 'Code Search', 'code-search', 'search'),
+       (gen_random_uuid(), 'Documentation', 'documentation', 'file-text');
 
--- 2. Inserir Usuários (Movi para cima para o Resource poder encontrar o ID)
 INSERT INTO users (id, created_at, email, password, role, username)
 VALUES (gen_random_uuid(), now(), 'exemple@gmail.com', '12345678', 'ADMIN', 'DearSanta');
 
--- 3. Inserir Tags
-INSERT INTO tags (id, name)
-VALUES (gen_random_uuid(), 'Java'),
-       (gen_random_uuid(), 'Spring Boot'),
-       (gen_random_uuid(), 'React'),
-       (gen_random_uuid(), 'PostgreSQL');
-
--- 4. Inserir Recursos (Corrigido princing -> pricing e ordem do User)
-INSERT INTO resources (id, created_at, description, is_approved, long_description, pricing_model, slug, thumbnail_url,
-                       title, url, category_id, user_id)
-VALUES (gen_random_uuid(),
-        now(),
-        'Chatbot para resolução de problemas',
-        true,
-        'ChatGPT é uma IA criada pela OpenAI para ajudar pessoas a resolver problemas',
-        'FREE',
-        'chat-gpt',
-        'http://exemple.com',
-        'ChatGPT',
-        'https://chatgpt.com/',
-        (SELECT id FROM categories WHERE name = 'Inteligência Artificial' LIMIT 1),
-       (SELECT id FROM users WHERE email = 'exemple@gmail.com' LIMIT 1)
-    );
+WITH inserted_tool AS (
+INSERT
+INTO tools (id,
+            created_at,
+            description,
+            is_approved,
+            pricing_model,
+            thumbnail_url,
+            name,
+            url,
+            user_id,
+            featured,
+            tool_type)
+VALUES (
+    gen_random_uuid(), now(), 'Chatbot para resolução de problemas', true, 'FREE', 'http://exemple.com', 'ChatGPT', 'https://chatgpt.com/', (SELECT id FROM users WHERE email = 'exemple@gmail.com' LIMIT 1), true, 'WEB'
+    )
+    RETURNING id
+    )
+-- 2. Associamos a Tool às categorias na tabela de junção
+INSERT
+INTO tools_categories (tool_id, category_id)
+SELECT inserted_tool.id,
+       categories.id
+FROM inserted_tool,
+     categories
+WHERE categories.name IN ('Chatbots', 'Productivity', 'Code Gen');

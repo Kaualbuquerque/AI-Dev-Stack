@@ -22,7 +22,6 @@ public class CategoryMapper {
         if (category == null) return null;
 
         return new CategoryResponseDTO(
-                category.getId(),
                 category.getName(),
                 category.getSlug(),
                 category.getIconKey()

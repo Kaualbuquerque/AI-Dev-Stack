@@ -5,29 +5,31 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kaua.AI_Dev_Stack.dto.request.ResourceRequestDTO;
-import kaua.AI_Dev_Stack.dto.response.ResourceResponseDTO;
-import kaua.AI_Dev_Stack.mapper.ResourceMapper;
-import kaua.AI_Dev_Stack.model.Resource;
-import kaua.AI_Dev_Stack.service.ResourceService;
+import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
+import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
+import kaua.AI_Dev_Stack.mapper.ToolMapper;
+import kaua.AI_Dev_Stack.model.Tool;
+import kaua.AI_Dev_Stack.model.User;
+import kaua.AI_Dev_Stack.service.ToolService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/resources")
+@RequestMapping("/tools")
 @Tag(
-        name = "Resources",
+        name = "Tools",
         description = "Endpoints for managing AI-powered tools")
-public class ResourceController {
-    private final ResourceService resourceService;
-    private final ResourceMapper resourceMapper;
+public class ToolController {
+    private final ToolService toolService;
+    private final ToolMapper toolMapper;
 
-    public ResourceController(ResourceService resourceService, ResourceMapper resourceMapper) {
-        this.resourceService = resourceService;
-        this.resourceMapper = resourceMapper;
+    public ToolController(ToolService toolService, ToolMapper toolMapper) {
+        this.toolService = toolService;
+        this.toolMapper = toolMapper;
     }
 
     @PostMapping
@@ -36,15 +38,15 @@ public class ResourceController {
             description = "Registers a new AI resource in the directory"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "AI Resource registered successfully"),
+            @ApiResponse(responseCode = "201", description = "AI Tool registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data"),
             @ApiResponse(responseCode = "409", description = "This AI tool URL is already registered"),
     })
-    public ResponseEntity<ResourceResponseDTO> save(@Valid @RequestBody ResourceRequestDTO body) {
-        Resource resource = resourceService.save(body);
+    public ResponseEntity<ToolResponseDTO> save(@Valid @RequestBody ToolRequestDTO body, @AuthenticationPrincipal User user) {
+        // O service já faz o trabalho de salvar e converter para DTO
+        ToolResponseDTO response = toolService.save(body);
 
-        ResourceResponseDTO response = resourceMapper.toResponseDTO(resource);
-
+        // Retornamos diretamente o response que veio do service
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -57,12 +59,12 @@ public class ResourceController {
             @ApiResponse(responseCode = "200", description = "Tools list retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "System failed to fetch tools list")
     })
-    public ResponseEntity<Page<Resource>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(resourceService.findAllApproved(pageable));
+    public ResponseEntity<Page<Tool>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(toolService.findAllApproved(pageable));
     }
 
     // @GetMapping("/{slug}")
-    // public ResponseEntity<Page<Resource>> findBySlug(@PathVariable String slug){
+    // public ResponseEntity<Page<Tool>> findBySlug(@PathVariable String slug){
     //     return ResponseEntity.();
     // }
 }
