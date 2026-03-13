@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Header from "./Header";
 import SearchModal from "./SearchModal";
+import { Toaster } from "sonner";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const [searchOpen, setSearchOpen] = useState(false);
@@ -14,6 +15,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <main className="pt-16">
                 {children}
             </main>
+            <Toaster richColors position="top-right"/>
         </>
     );
 }

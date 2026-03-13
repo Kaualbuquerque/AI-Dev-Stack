@@ -9,18 +9,12 @@ const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
 const SelectValue = SelectPrimitive.Value
 
-interface SelectPropsTrigger
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> { }
-interface SelectPropsButton
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton> { }
-interface SelectPropsContent
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> { }
-interface SelectPropsLabel
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label> { }
-interface SelectPropsItem
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> { }
-interface SelectPropsSeparator
-    extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator> { }
+type SelectPropsTrigger = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
+type SelectPropsButton = React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+type SelectPropsContent = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+type SelectPropsLabel = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
+type SelectPropsItem = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+type SelectPropsSeparator = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
 
 const SelectTrigger = React.forwardRef<
     React.ComponentRef<typeof SelectPrimitive.Trigger>,

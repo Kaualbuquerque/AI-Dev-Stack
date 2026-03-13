@@ -5,6 +5,14 @@ import { User } from "./authservice";
 interface PaginatedResponse<T> {
     content: T[];
 }
+export interface SuggestToolForm {
+    name: string;
+    description: string;
+    url: string;
+    thumbnailUrl: string;
+    pricingModel: PricingType;
+    toolType: ToolType;
+}
 
 export interface Tools {
     id: number;
@@ -33,4 +41,8 @@ export const toolsService = {
     // Adicione quando souber o endpoint correto
     upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     removeUpvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'DELETE' }),
+    suggest: (formData: SuggestToolForm) => apiFetch<Tools>('/tools', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+    }),
 }

@@ -3,8 +3,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { cn } from "@/app/lib/utils"
 import { Check } from "lucide-react"
 
-interface CheckboxProps
-    extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Checkbox> { }
+type CheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Checkbox>
 
 const Checkbox = React.forwardRef<
     React.ComponentRef<typeof CheckboxPrimitive.Checkbox>, // O tipo do elemento DOM

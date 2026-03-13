@@ -9,8 +9,7 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 const DialogClose = DialogPrimitive.Close;
 
-interface DialogProps
-    extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> { }
+type DialogProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 
 const DialogOverlay = React.forwardRef<
     React.ComponentRef<typeof DialogPrimitive.Overlay>, // O tipo do elemento DOM
