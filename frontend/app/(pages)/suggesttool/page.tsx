@@ -3,12 +3,16 @@
 import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/Select";
+import { Textarea } from "@/app/components/ui/Textarea";
+import { cn } from "@/app/lib/utils";
 import { userService } from "@/app/services/authservice";
 import { SuggestToolForm, toolsService } from "@/app/services/toolsService";
+import { PricingType, ToolType } from "@/app/types/filter";
 import { createPageUrl } from "@/app/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, FileText, Globe, Lightbulb, Sparkles } from "lucide-react";
+import { ArrowLeft, DollarSign, FileText, Globe, ImageIcon, Layers, Lightbulb, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -22,8 +26,8 @@ export default function SuggestTool() {
         description: '',
         url: '',
         thumbnailUrl: '',
-        pricingModel: 'Free',
-        toolType: 'web',
+        pricingModel: '' as PricingType,
+        toolType: '' as ToolType,
     });
     const router = useRouter();
 
@@ -61,7 +65,11 @@ export default function SuggestTool() {
             return;
         }
 
-        await submitTool(formData);
+        const thumbnailUrl = formData.url
+            ? `https://www.google.com/s2/favicons?domain=${formData.url}&sz=128`
+            : '';
+
+        await submitTool({ ...formData, thumbnailUrl });
     };
 
     return (
@@ -134,12 +142,78 @@ export default function SuggestTool() {
                                     <Input
                                         id="url"
                                         type="url"
-                                        value={formData.name}
+                                        value={formData.url}
                                         onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                                         placeholder="https://example.com"
                                         className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-500"
                                         required
                                     />
+                                </div>
+
+                                {/* Thumbnail URL */}
+                                {formData.url && (
+                                    <div className="space-y-2">
+                                        <Label className="text-white flex items-center gap-2">
+                                            <ImageIcon className="w-4 h-4 text-cyan-400" />
+                                            Thumbnail Previw
+                                        </Label>
+                                        <div className="flex items-center gap-4 p-4 bg-slate-900/50 border border-slate-700 rounded-lg">
+                                            <img
+                                                src={`https://www.google.com/s2/favicons?domain=${formData.url}&sz=128`}
+                                                alt="Tool thumbnail"
+                                                className="w-16 h-16 rounded-lg object-contain bg-slate-800 p-2"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Pricing Model */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="pricingModel" className="text-white flex items-center gap-2">
+                                        <DollarSign className="w-4 h-4 text-cyan-400" />
+                                        Pricing Model *
+                                    </Label>
+                                    <Select
+                                        value={formData.pricingModel}
+                                        onValueChange={(value) => setFormData({ ...formData, pricingModel: value as PricingType })}
+                                    >
+                                        <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                                            <SelectValue placeholder="Select pricing model" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800 border-slate-700">
+                                            <SelectItem value="Free" className="text-white hover:bg-slate-700">Free</SelectItem>
+                                            <SelectItem value="Freemium" className="text-white hover:bg-slate-700">Freemium</SelectItem>
+                                            <SelectItem value="Paid" className="text-white hover:bg-slate-700">Paid</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Tool Type*/}
+                                <div className="space-y-2">
+                                    <Label className="text-white flex items-center gap-2">
+                                        <Layers className="w-4 h-4 text-cyan-400" />
+                                        Tool Type *
+                                    </Label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {(["cli", "web", "vscode", "jetbrains", "api", "desktop"] as ToolType[]).map((type) => (
+                                            <button
+                                                key={type}
+                                                type="button"
+                                                onClick={() => {
+                                                    const current = formData.toolType;
+                                                    setFormData({ ...formData, toolType: current === type ? '' as ToolType : type });
+                                                }}
+                                                className={cn(
+                                                    "px-3 py-2 rounded-lg border text-sm font-medium transition-all capitalize",
+                                                    formData.toolType === type
+                                                        ? "border-cyan-500 bg-cyan-500/20 text-cyan-400"
+                                                        : "border-slate-700 bg-slate-900/50 text-slate-400 hover:border-slate-500"
+                                                )}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Description */}
@@ -148,7 +222,42 @@ export default function SuggestTool() {
                                         <FileText className="w-4 h-4 text-cyan-400" />
                                         Why should we add this tool?
                                     </Label>
+                                    <Textarea
+                                        id="description"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Tell us what makes this tool special..."
+                                        className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-500 min-h-30"
+                                    />
                                 </div>
+
+                                {/* Submit Button */}
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white py-6 text-lg"
+                                >
+                                    {isSubmitting ? (
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                        >
+                                            <Sparkles className="w-5 h-5 mr-2" />
+                                        </motion.div>
+                                    ) : (
+                                        <>
+                                            <Send className="w-5 h-5 mr2" />
+                                            Submit Suggestion
+                                        </>
+                                    )}
+                                </Button>
+
+                                {!user && (
+                                    <p className="text-center text-sm text-slate-500">
+                                        You'll need to sign in to submit a suggestion.
+                                    </p>
+                                )}
+
                             </div>
                         </form>
                     </div>

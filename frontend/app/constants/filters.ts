@@ -7,9 +7,9 @@ export const FILTER_GROUPS: FilterGroup[] = [
         label: 'Pricing',
         icon: DollarSign,
         options: [
-            { value: 'free', label: 'Free', color: 'text-emerald-400' },
-            { value: 'freemium', label: 'Freemium', color: 'text-amber-400' },
-            { value: 'paid', label: 'Paid', color: 'text-purple-400' },
+            { value: 'Free', label: 'Free', color: 'text-emerald-400' },
+            { value: 'Freemium', label: 'Freemium', color: 'text-amber-400' },
+            { value: 'Paid', label: 'Paid', color: 'text-purple-400' },
         ],
     },
     {
