@@ -8,21 +8,8 @@ import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { pricingConfig, typeIcons } from "@/app/types/princing";
 
-const pricingConfig = {
-    Free: { label: 'Free', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-    Freemiun: { label: 'Freemium', className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-    Paid: { label: 'Paid', className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-};
-
-const typeIcons = {
-    cli: '⌨️',
-    web: '🌐',
-    vscode: '💜',
-    jetbrains: '🔶',
-    api: '🔌',
-    desktop: '🖥️',
-};
 
 interface ToolCardProps {
     tool: Tools;
@@ -36,8 +23,6 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
     const [isUpvoting, setIsUpvoting] = useState(false);
     const [localUpvotes, setLocalUpvotes] = useState(tool.upvotesCount || 0);
     const [hasUpvoted, setHasUpvoted] = useState(tool.votedByMe);
-
-    const router = useRouter();
 
     const handleUpvote = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -89,7 +74,7 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
                 'transition-all duration-300',
                 'hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]'
             )}>
-                <Link href={createPageUrl('ToolDetails') + `?name=${tool.name}`}>
+                <Link href={createPageUrl('Tool-details') + `?name=${tool.name}`}>
 
                     {/* Featured Badge */}
                     {tool.featured && (

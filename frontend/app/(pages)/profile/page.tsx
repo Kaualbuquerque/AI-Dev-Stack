@@ -120,7 +120,7 @@ export default function Profile() {
                     {upvotedTools.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {upvotedTools.map((tool) => (
-                                <Link key={tool.name} href={createPageUrl("ToolDetails") + `?name=${tool.name}`}>
+                                <Link key={tool.name} href={createPageUrl("Tool-details") + `?name=${tool.name}`}>
                                     <div className={cn(
                                         "flex items-center gap-3 p-4 rounded-xl",
                                         "bg-slate-800/50 border border-slate-700/50",

@@ -18,7 +18,6 @@ export default function Community() {
     } = useQuery<Tools[]>({
         queryKey: ['tools'],
         queryFn: () => toolsService.getAll().then(res => res.content || []),
-        // O 'select' intercepta o dado e o entrega ordenado para a variável 'tools'
         select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
     });
 
@@ -112,7 +111,7 @@ export default function Community() {
 
                             <div className='space-y-3'>
                                 {topTools.map((tool, index) => (
-                                    <Link key={tool.name} href={createPageUrl('ToolDetails') + `?name=${tool.name}`}>
+                                    <Link key={tool.name} href={createPageUrl('Tool-details') + `?name=${tool.name}`}>
                                         <motion.div
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
@@ -176,7 +175,7 @@ export default function Community() {
                             {trendingTools.length > 0 ? (
                                 <div className='space-y-4'>
                                     {trendingTools.map((tool, index) => (
-                                        <Link key={tool.name} href={createPageUrl('ToolDetails' + `?name=${tool.name}`)}>
+                                        <Link key={tool.name} href={createPageUrl('Tool-details' + `?name=${tool.name}`)}>
                                             <motion.div
                                                 initial={{ opacity: 0, x: 20 }}
                                                 animate={{ opacity: 1, x: 0 }}

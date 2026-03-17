@@ -67,7 +67,7 @@ export default function Header({ onOpenSearch }: HeaderProps) {
                                 Community
                             </Button>
                         </Link>
-                        <Link href={createPageUrl('SuggestTool')}>
+                        <Link href={createPageUrl('Suggest-tool')}>
                             <Button className="bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white border-0">
                                 <Sparkles className="w-4 h-4 mr-2" />
                                 Suggest Tool
@@ -123,7 +123,7 @@ export default function Header({ onOpenSearch }: HeaderProps) {
                                 Community
                             </Button>
                         </Link>
-                        <Link href={createPageUrl('SuggestTool')} onClick={() => setMobileMenuOpen(false)}>
+                        <Link href={createPageUrl('Suggest-tool')} onClick={() => setMobileMenuOpen(false)}>
                             <Button className="w-full bg-linear-to-r from-cyan-500 to-purple-500">
                                 <Sparkles className="w-4 h-4 mr-2" />
                                 Suggest Tool

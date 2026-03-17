@@ -1,8 +1,6 @@
 import { ElementType } from "react";
-
-export type ToolType = 'cli' | 'web' | 'vscode' | 'jetbrains' | 'api' | 'desktop';
-
-export type PricingType = 'Free' | 'Freemiun' | 'Paid'
+import { PricingType } from "./princing";
+import { ToolType } from "./tool";
 
 export interface FiltersData {
     pricing: PricingType[];
