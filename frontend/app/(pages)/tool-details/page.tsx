@@ -6,7 +6,7 @@ import Skeleton from "@/app/components/ui/Skeleton";
 import { Tools, toolsService } from "@/app/services/toolsService";
 import { createPageUrl } from "@/app/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowUp, Calendar, DollarSign, ExternalLink, Monitor, Share2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUp, Calendar, DollarSign, ExternalLink, Layers, Monitor, Share2, Sparkles, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -234,6 +234,58 @@ export default function ToolDetails() {
                 </motion.div>
 
                 {/* Details Grid */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"
+                >
+                    {/* Tech Stack */}
+                    {tool.categories && tool.categories.length > 0 && (
+                        <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Layers className="w-5 h-5 text-cyan-400" />
+                                <h3 className="font-semibold text-white">Compatible Stack</h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {tool.categories.map((tech) => (
+                                    <Badge
+                                        key={tech.name}
+                                        variant="outline"
+                                        className="bg-slate-700/50 border-slate-600 text-slate-300 capitalize"
+                                    >
+                                        {tech.name}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* categories */}
+                    {tool.categories && tool.categories.length > 0 && (
+                        <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Tag className="w-5 h-5 text-purple-400" />
+                                <h3 className="font-semibold text-white">Categories</h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {tool.categories.map((cat) => (
+                                    <Link
+                                        key={cat.name}
+                                        href={createPageUrl('Home') + `?search=${encodeURIComponent(cat.name)}`}
+                                    >
+                                        <Badge
+                                            variant="outline"
+                                            className="bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 cursor-pointer transition-colors"
+                                        >
+                                            #{cat.name}
+                                        </Badge>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </motion.div>
             </div>
         </div>
     )

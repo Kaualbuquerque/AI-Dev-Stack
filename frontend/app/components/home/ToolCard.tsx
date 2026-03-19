@@ -7,8 +7,8 @@ import Link from "next/link";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useState } from "react";
-import { useRouter } from 'next/navigation';
-import { pricingConfig, typeIcons } from "@/app/types/princing";
+import { pricingConfig } from "@/app/types/princing";
+import { typeIcons } from "@/app/types/tool";
 
 
 interface ToolCardProps {
