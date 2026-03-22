@@ -23,7 +23,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor((secret.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private String generateToken(String email) {
+    public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())

@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kaua.AI_Dev_Stack.dto.request.UserRequestDTO;
+import kaua.AI_Dev_Stack.dto.request.UserUpdateDTO;
 import kaua.AI_Dev_Stack.dto.response.UserResponseDTO;
 import kaua.AI_Dev_Stack.mapper.UserMapper;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -67,5 +69,47 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> findByEmail(@RequestParam String email) {
         User user = userService.findByEmail(email);
         return ResponseEntity.ok(userMapper.toResponseDTO(user));
+    }
+
+    @GetMapping("/me")
+    @Operation(
+            summary = "Get current user",
+            description = "Returns the authenticated user profile based on the JWT token"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token")
+    })
+    public ResponseEntity<UserResponseDTO> getMe(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userMapper.toResponseDTO(user));
+    }
+
+    @PutMapping("/me")
+    @Operation(
+            summary = "Update profile",
+            description = "Updates the authenticated user profile"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token")
+    })
+    public ResponseEntity<UserResponseDTO> updateMe(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateDTO body) {
+        User updated = userService.update(user, body);
+        return ResponseEntity.ok(userMapper.toResponseDTO(updated));
+    }
+
+    @DeleteMapping("/me")
+    @Operation(
+            summary = "Delete account",
+            description = "Permanently deletes the authenticated user account"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Account deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token")
+    })
+    public ResponseEntity<Void> deleteMe(@AuthenticationPrincipal User user) {
+        userService.delete(user.getId());
+        return ResponseEntity.noContent().build();
     }
 }
