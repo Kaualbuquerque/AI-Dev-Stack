@@ -1,4 +1,4 @@
-INSERT INTO categories (id, name, slug, icon_key)
+INSERT INTO tags (id, name, slug, icon_key)
 VALUES (gen_random_uuid(), 'Code Gen', 'code-gen', 'code'),
        (gen_random_uuid(), 'UI', 'ui', 'layout'),
        (gen_random_uuid(), 'React', 'react', 'atom'),
@@ -28,7 +28,8 @@ INTO tools (id,
             url,
             user_id,
             featured,
-            tool_type)
+            tool_type,
+            )
 VALUES (
     gen_random_uuid(), now(), 'Chatbot para resolução de problemas', true, 'FREE', 'http://exemple.com', 'ChatGPT', 'https://chatgpt.com/', (SELECT id FROM users WHERE email = 'exemple@gmail.com' LIMIT 1), true, 'WEB'
     )
@@ -36,9 +37,9 @@ VALUES (
     )
 -- 2. Associamos a Tool às categorias na tabela de junção
 INSERT
-INTO tools_categories (tool_id, category_id)
+INTO tools_tags (tool_id, category_id)
 SELECT inserted_tool.id,
-       categories.id
+       tags.id
 FROM inserted_tool,
-     categories
-WHERE categories.name IN ('Chatbots', 'Productivity', 'Code Gen');
+     tags
+WHERE tags.name IN ('Chatbots', 'Productivity', 'Code Gen');

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kaua.AI_Dev_Stack.model.Enums.PricingType;
+import kaua.AI_Dev_Stack.model.Enums.StackType;
 import kaua.AI_Dev_Stack.model.Enums.ToolType;
 import org.hibernate.validator.constraints.URL;
 
@@ -22,7 +23,7 @@ public record ToolRequestDTO(
 
         @Schema(description = "A short summary of the tool", example = "Advanced AI language model")
         @NotBlank(message = "Description is required")
-        @Size(max = 255)
+        @Size(max = 500) // ✅ atualizado de 255 para 500
         String description,
 
         @Schema(description = "Official website URL", example = "https://openai.com/chatgpt")
@@ -38,15 +39,18 @@ public record ToolRequestDTO(
         @NotNull(message = "Pricing model is required")
         PricingType pricingModel,
 
-        @Schema(description = "The specific type of tool (e.g., WEB, MOBILE)")
+        @Schema(description = "The specific type of tool")
         @NotNull(message = "Tool type is required")
         ToolType toolType,
 
-        @Schema(description = "Whether the tool should be featured", example = "false")
-        boolean featured,
+        @Schema(description = "Compatible technology stacks", example = "[\"JAVA\", \"PYTHON\"]")
+        @NotEmpty(message = "At least one stack is required")
+        @Size(max = 5, message = "Maximum of 5 stacks allowed")
+        List<StackType> stacks,
 
-        @Schema(description = "List of category IDs this tool belongs to")
-        @NotEmpty(message = "At least one category ID is required")
-        List<UUID> categoryIds
+        @Schema(description = "List of tag IDs this tool belongs to")
+        @NotEmpty(message = "At least one tag is required")
+        @Size(max = 5, message = "Maximum of 5 tags allowed")
+        List<UUID> tagIds
 ) {
 }

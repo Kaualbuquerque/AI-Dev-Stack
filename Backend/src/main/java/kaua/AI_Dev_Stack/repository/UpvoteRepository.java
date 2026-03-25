@@ -3,9 +3,12 @@ package kaua.AI_Dev_Stack.repository;
 import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.Upvote;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -20,4 +23,6 @@ public interface UpvoteRepository extends JpaRepository<Upvote, UUID> {
     // 3. Para deletar o voto (caso o usuário queira desfazer o upvote)
     void deleteByUserIdAndToolId(UUID userId, UUID toolId);
 
+    @Query("SELECT u.tool.id FROM Upvote u WHERE u.user.id = :userId")
+    Set<UUID> findToolIdsByUserId(@Param("userId") UUID userId);
 }

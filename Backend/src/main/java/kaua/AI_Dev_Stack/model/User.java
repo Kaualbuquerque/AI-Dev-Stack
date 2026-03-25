@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,12 +64,19 @@ public class User implements UserDetails {
     private List<Upvote> upvotes = new ArrayList<>();
 
     @Override
+    @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
     @JsonIgnore
+    @NullMarked
     public String getUsername() {
         return email;
     }

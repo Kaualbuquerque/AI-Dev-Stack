@@ -3,51 +3,76 @@ package kaua.AI_Dev_Stack.service;
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
 import kaua.AI_Dev_Stack.mapper.ToolMapper;
-import kaua.AI_Dev_Stack.model.Category;
+import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.model.Tool;
-import kaua.AI_Dev_Stack.repository.CategoryRepository;
+import kaua.AI_Dev_Stack.model.User;
+import kaua.AI_Dev_Stack.repository.TagRepository;
 import kaua.AI_Dev_Stack.repository.ToolRepository;
+import kaua.AI_Dev_Stack.repository.UpvoteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class ToolService {
 
     private final ToolRepository toolRepository;
-    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
     private final ToolMapper toolMapper;
+    private final UpvoteRepository upvoteRepository;
 
-    public ToolService(ToolRepository toolRepository, CategoryRepository categoryRepository, ToolMapper toolMapper) {
+    public ToolService(ToolRepository toolRepository, TagRepository tagRepository,
+                       ToolMapper toolMapper, UpvoteRepository upvoteRepository) {
         this.toolRepository = toolRepository;
-        this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
         this.toolMapper = toolMapper;
+        this.upvoteRepository = upvoteRepository;
     }
 
     @Transactional
-    public ToolResponseDTO save(ToolRequestDTO dto) {
-        // 1. Busca as categorias no banco pelos IDs do DTO
-        List<Category> categories = categoryRepository.findAllById(dto.categoryIds());
+    public ToolResponseDTO save(ToolRequestDTO dto, User currentUser) {
+        // Busca as tags no banco pelos IDs
+        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
-        if (categories.isEmpty()) {
-            throw new RuntimeException("Nenhuma categoria encontrada para os IDs fornecidos.");
+        if (tags.isEmpty()) {
+            throw new RuntimeException("No tags found for the provided IDs.");
         }
 
-        // 2. Chama o mapper passando o DTO e a lista de categorias resolvida
-        Tool tool = toolMapper.toEntity(dto, categories);
+        // Valida o limite de 5 tags
+        if (tags.size() > 5) {
+            throw new RuntimeException("Maximum of 5 tags allowed.");
+        }
 
-        // 4. Salva a entidade
+        // Monta a entidade com tags e usuário autenticado
+        Tool tool = toolMapper.toEntity(dto, tags, currentUser);
+
+        // Salva
         Tool savedTool = toolRepository.save(tool);
 
-        // 5. Retorna o ResponseDTO (votedByMe false por padrão para novos cadastros)
-        return toolMapper.toResponseDTO(savedTool, null);
+        // Retorna o DTO - votedByMe false e upvotesCount 0 para nova ferramenta
+        return toolMapper.toResponseDTO(savedTool, 0, false);
     }
 
     @Transactional(readOnly = true)
-    public Page<Tool> findAllApproved(Pageable pageable) {
-        return toolRepository.findByIsApprovedTrue(pageable);
+    public Page<ToolResponseDTO> findAllApproved(Pageable pageable, User currentUser) {
+        // Busca as tools paginadas
+        Page<Tool> tools = toolRepository.findByIsApprovedTrue(pageable);
+
+        // Busca os IDs das tools que o usuário votou - uma única query
+        Set<UUID> votedToolIds = currentUser != null
+                ? upvoteRepository.findToolIdsByUserId(currentUser.getId())
+                : Set.of();
+
+        // Mapeia cada tool para DTO calculando upvotesCount e votedByMe
+        return tools.map(tool -> toolMapper.toResponseDTO(
+                tool,
+                tool.getUpvotes().size(),
+                votedToolIds.contains(tool.getId())
+        ));
     }
 }

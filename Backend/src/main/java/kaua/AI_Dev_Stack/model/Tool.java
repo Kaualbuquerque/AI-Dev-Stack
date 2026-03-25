@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import kaua.AI_Dev_Stack.model.Enums.PricingType;
+import kaua.AI_Dev_Stack.model.Enums.StackType;
 import kaua.AI_Dev_Stack.model.Enums.ToolType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +34,7 @@ public class Tool {
     private String name;
 
     @NotBlank(message = "Description is required")
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 500)
     private String description;
 
     @NotBlank(message = "URL is required")
@@ -41,6 +42,7 @@ public class Tool {
     @Column(nullable = false, unique = true)
     private String url;
 
+    @URL(message = "Invalid thumbnail URL")
     private String thumbnailUrl;
 
     @NotNull(message = "Pricing model must be specified") // Para Enums usamos @NotNull
@@ -61,16 +63,22 @@ public class Tool {
     @Enumerated(EnumType.STRING)
     private ToolType toolType;
 
+    @ElementCollection
+    @CollectionTable(name = "tool_stacks", joinColumns = @JoinColumn(name = "tool_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stack")
+    private List<StackType> stacks = new ArrayList<>();
+
     // Relacionamentos
 
-    @NotEmpty(message = "At least one category is required")
+    @NotEmpty(message = "At least one tag is required")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "tools_categories",
+            name = "tools_tags",
             joinColumns = @JoinColumn(name = "tool_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private List<Category> categories = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @NotNull(message = "Owner user is required")
     @ManyToOne(fetch = FetchType.LAZY)

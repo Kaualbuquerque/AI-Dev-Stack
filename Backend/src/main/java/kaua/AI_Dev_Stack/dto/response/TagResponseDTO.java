@@ -2,24 +2,22 @@ package kaua.AI_Dev_Stack.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.UUID;
-
-@Schema(description = "Data representation of a tag, including its popularity metrics.")
+@Schema(description = "Data representation of a category returned by the system.")
 public record TagResponseDTO(
 
         @Schema(
-                description = "Unique identifier (UUID) of the tag.",
-                example = "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6")
-        UUID id,
-
-        @Schema(
-                description = "The display name of the tag.",
-                example = "Machine Learning")
+                description = "Display name of the category.",
+                example = "Image Generators")
         String name,
 
         @Schema(
-                description = "Total number of AI resources associated with this tag.",
-                example = "45")
-        Long usageCount
+                description = "URL-friendly version of the category name.",
+                example = "image-generators")
+        String slug,
+
+        @Schema(
+                description = "Icon identifier for frontend rendering.",
+                example = "image-icon")
+        String iconKey
 ) {
 }

@@ -1,9 +1,9 @@
 package kaua.AI_Dev_Stack.mapper;
 
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
-import kaua.AI_Dev_Stack.dto.response.CategoryResponseDTO;
+import kaua.AI_Dev_Stack.dto.response.TagResponseDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
-import kaua.AI_Dev_Stack.model.Category;
+import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.User;
 import org.springframework.stereotype.Component;
@@ -15,59 +15,49 @@ import java.util.List;
 public class ToolMapper {
 
     // Converte de DTO de entrada para Entidade
-    public Tool toEntity(ToolRequestDTO dto, List<Category> categories) {
+    public Tool toEntity(ToolRequestDTO dto, List<Tag> tags, User user) {
         if (dto == null) return null;
 
         Tool tool = new Tool();
-
-        // Mapeamento de campos básicos
-        // Usei .title() assumindo que seu RequestDTO usa o padrão 'title' do front
-        tool.setName(dto.name() != null ? dto.name().trim() : null);
+        tool.setName(dto.name().trim());
         tool.setDescription(dto.description());
         tool.setUrl(dto.url());
         tool.setThumbnailUrl(dto.thumbnailUrl());
         tool.setPricingModel(dto.pricingModel());
-
-        // Novos campos
         tool.setToolType(dto.toolType());
-        tool.setFeatured(dto.featured());
-
-        // Associa a lista de categorias encontradas no banco
-        if (categories != null) {
-            tool.setCategories(new ArrayList<>(categories));
-        }
+        tool.setFeatured(false);
+        tool.setStacks(new ArrayList<>(dto.stacks()));
+        tool.setTags(new ArrayList<>(tags));
+        tool.setUser(user);
 
         return tool;
     }
 
     // Converte de Entidade para DTO de saída (Response)
-    public ToolResponseDTO toResponseDTO(Tool tool, User currentUser) {
+    public ToolResponseDTO toResponseDTO(Tool tool, int upvotesCount, boolean votedByMe) {
         if (tool == null) return null;
 
-        // 1. Lógica do votedByMe
-        boolean votedByMe = false;
-        if (currentUser != null && tool.getUpvotes() != null) {
-            votedByMe = tool.getUpvotes().stream()
-                    .anyMatch(upvote -> upvote.getUser().getId().equals(currentUser.getId()));
-        }
+        // Mapeia tags para TagResponseDTO
+        List<TagResponseDTO> tagDTOs = tool.getTags() != null
+                ? tool.getTags().stream()
+                .map(tag -> new TagResponseDTO(tag.getName(), tag.getSlug(), tag.getIconKey()))
+                .toList()
+                : List.of();
 
-        // 2. Mapeamento da lista de Categorias (Entidade -> DTO resumido)
-        List<CategoryResponseDTO> categoryDTOs = tool.getCategories().stream()
-                .map(cat -> new CategoryResponseDTO(cat.getName(), cat.getSlug(), cat.getIconKey()))
-                .toList();
-
-        // 3. Construção do Record (respeitando a ordem e nomes do seu DTO atualizado)
-        return new ToolResponseDTO(               // ID (UUID)
-                tool.getName(),                  // Título/Nome
+        return new ToolResponseDTO(
+                tool.getId(),
+                tool.getName(),
                 tool.getDescription(),
                 tool.getUrl(),
                 tool.getThumbnailUrl(),
                 tool.getPricingModel(),
-                tool.getToolType().getLabel(), // Converte Enum para String amigável
+                tool.getToolType(),
+                tool.getStacks(),
                 tool.isFeatured(),
+                tool.getCreatedAt(),
                 votedByMe,
-                tool.getUpvotes() != null ? tool.getUpvotes().size() : 0, // Evita NullPointer
-                categoryDTOs                     // A nova lista de categorias
+                upvotesCount,
+                tagDTOs
         );
     }
 }

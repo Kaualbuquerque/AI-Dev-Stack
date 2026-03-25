@@ -4,17 +4,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "Data required to identify or register a technology tag")
+@Schema(description = "Data required to create or update an AI resource category")
 public record TagRequestDTO(
 
         @Schema(
-                description = "The unique name of the tag. It will be used to search for an existing tag or create a new one",
-                example = "Stable Diffusion",
+                description = "Unique name of the category",
+                example = "Code Assistants",
                 minLength = 2,
+                maxLength = 50
+        )
+        @NotBlank(message = "Tag name is required")
+        @Size(min = 2, max = 50, message = "Tag name must be between 2 and 50 characters")
+        String name,
+
+        @Schema(
+                description = "Identifier or key for the category icon",
+                example = "cpu-chip",
                 maxLength = 100
         )
-        @NotBlank(message = "Name is required")
-        @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
-        String name
+        @Size(max = 100)
+        String iconKey
 ) {
 }

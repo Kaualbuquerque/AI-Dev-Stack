@@ -14,18 +14,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "tags")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category {
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotBlank(message = "Category name is required")
+    @NotBlank(message = "Tag name is required")
     @Column(unique = true, nullable = false, length = 50)
     private String name;
 
@@ -39,7 +39,7 @@ public class Category {
 
     // Relacionamento bidirecional: permite buscar recursos a partir da categoria
     // O 'mappedBy' indica que o lado "dono" do relacionamento é a Tool.
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany(mappedBy = "tags")
     @JsonIgnore // Importante para evitar o loop infinito no JSON que você mencionou
     private List<Tool> tools = new ArrayList<>();
 }
