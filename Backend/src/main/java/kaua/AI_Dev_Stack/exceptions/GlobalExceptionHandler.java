@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler{
 
-    // 404 - Resource not found
+    // 404 - recurso não encontrado
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler{
         );
     }
 
-    // 409 - Duplicate resource
+    // 409 - recurso duplicado
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ErrorResponseDTO> handleDuplicate(DuplicateResourceException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler{
         );
     }
 
-    // 400 - Validation error
+    // 400 - erros de validação (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex){
         String message = ex.getBindingResult()
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler{
         );
     }
 
-    // 500 - any other untreated error
+    // 500 - qualquer outro erro não tratado
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
