@@ -27,31 +27,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        // 1. Prioridade Total: Se for login/auth, ignore o resto do filtro IMEDIATAMENTE
+        if (path.startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
-        // Se não tem token, passa para o próximo filtro
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+        // 2. Verifica se o header existe e segue o padrão "Bearer "
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String token = authHeader.substring(7);
 
-        if (!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        try {
+            // 3. Validação do Token
+            if (jwtService.isTokenValid(token)) {
+                final String email = jwtService.extractEmail(token);
 
-        final String email = jwtService.extractEmail(token);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    userRepository.findByEmailIgnoreCase(email).ifPresent(user -> {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        // Se o email existe e não há autenticação no contexto ainda
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            userRepository.findByEmailIgnoreCase(email).ifPresent(user -> {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            });
+                        // Define a autenticação no contexto do Spring
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    });
+                }
+            }
+        } catch (Exception e) {
+            // Logar erro de token se necessário, mas não interromper a cadeia
+            // a menos que queira retornar 401 explícito aqui
         }
 
         filterChain.doFilter(request, response);

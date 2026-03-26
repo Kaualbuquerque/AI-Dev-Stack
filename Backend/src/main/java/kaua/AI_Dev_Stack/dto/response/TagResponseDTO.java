@@ -2,7 +2,7 @@ package kaua.AI_Dev_Stack.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Data representation of a category returned by the system.")
+@Schema(description = "Data representation of a tag returned by the system.")
 public record TagResponseDTO(
 
         @Schema(

@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/tags")
 @io.swagger.v3.oas.annotations.tags.Tag(
-        name = "Categories",
-        description = "Thematic organization of AI resources. Allows grouping tools by area of expertise, such as Design, NLP, or Development")
+        name = "Tags",
+        description = "Thematic tags for AI tools. Allows grouping tools by area of expertise, such as Design, NLP, or Development")
 public class TagController {
     private final TagService tagService;
     private final TagMapper tagMapper;
@@ -32,7 +32,7 @@ public class TagController {
     @PostMapping
     @Operation(
             summary = "Create category",
-            description = "Creates a new category with a unique slug")
+            description = "Creates a new tag — requires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Tag created"),
             @ApiResponse(responseCode = "400", description = "Invalid data"),

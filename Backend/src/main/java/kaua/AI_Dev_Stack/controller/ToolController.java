@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
-import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.service.ToolService;
 import kaua.AI_Dev_Stack.service.UpvoteService;
@@ -73,7 +72,7 @@ public class ToolController {
             @ApiResponse(responseCode = "404", description = "Tool not found")
     })
     public ResponseEntity<Void> toggleUpvote(@PathVariable UUID toolId, @AuthenticationPrincipal User user) {
-        upvoteService.toggleUpvote(user.getId(), toolId);
+        upvoteService.toggleUpvote(user, toolId);
         return ResponseEntity.ok().build();
     }
 }
