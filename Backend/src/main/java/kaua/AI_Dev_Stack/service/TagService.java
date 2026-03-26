@@ -1,6 +1,8 @@
 package kaua.AI_Dev_Stack.service;
 
 import kaua.AI_Dev_Stack.dto.request.TagRequestDTO;
+import kaua.AI_Dev_Stack.exceptions.DuplicateResourceException;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.mapper.TagMapper;
 import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.repository.TagRepository;
@@ -26,7 +28,7 @@ public class TagService {
     @Transactional
     public Tag save(TagRequestDTO dto) {
         if (tagRepository.existsByName(dto.name())) {
-            throw new RuntimeException("Tag with name " + dto.name() + " already exists.");
+            throw new DuplicateResourceException("Tag with name " + dto.name() + " already exists.");
         }
 
         Tag tag = tagMapper.toEntity(dto);
@@ -39,13 +41,13 @@ public class TagService {
     @Transactional(readOnly = true)
     public Tag findById(UUID id) {
         return tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tag not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
     }
 
     @Transactional(readOnly = true)
     public Tag findBySlug(String slug) {
         return tagRepository.findBySlugIgnoreCase(slug)
-                .orElseThrow(() -> new RuntimeException("Tag not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
     }
 
     @Transactional(readOnly = true)

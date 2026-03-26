@@ -2,6 +2,7 @@ package kaua.AI_Dev_Stack.service;
 
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.mapper.ToolMapper;
 import kaua.AI_Dev_Stack.model.Tag;
 import kaua.AI_Dev_Stack.model.Tool;
@@ -40,7 +41,7 @@ public class ToolService {
         List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
         if (tags.isEmpty()) {
-            throw new RuntimeException("No tags found for the provided IDs.");
+            throw new ResourceNotFoundException("No tags found for the provided IDs.");
         }
 
         // Valida o limite de 5 tags

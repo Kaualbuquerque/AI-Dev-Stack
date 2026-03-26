@@ -2,6 +2,8 @@ package kaua.AI_Dev_Stack.service;
 
 import kaua.AI_Dev_Stack.dto.request.UserRequestDTO;
 import kaua.AI_Dev_Stack.dto.request.UserUpdateDTO;
+import kaua.AI_Dev_Stack.exceptions.DuplicateResourceException;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.mapper.UserMapper;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.repository.UserRepository;
@@ -26,7 +28,7 @@ public class UserService {
     @Transactional
     public User register(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new RuntimeException("This email address is already in use.");
+            throw new DuplicateResourceException("This email address is already in use.");
         }
 
         User user = userMapper.toEntity(dto);
@@ -57,6 +59,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 }

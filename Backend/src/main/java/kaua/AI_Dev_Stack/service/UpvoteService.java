@@ -1,5 +1,6 @@
 package kaua.AI_Dev_Stack.service;
 
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.Upvote;
 import kaua.AI_Dev_Stack.model.User;
@@ -24,7 +25,7 @@ public class UpvoteService {
     public void toggleUpvote(User user, UUID toolId) {
 
         Tool tool = toolRepository.findById(toolId)
-                .orElseThrow(() -> new RuntimeException("Tool not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tool not found"));
 
         //  Lógica do Toggle
         if (upvoteRepository.existsByUserIdAndToolId(user.getId(), toolId)) {

@@ -2,6 +2,7 @@ package kaua.AI_Dev_Stack.service;
 
 import kaua.AI_Dev_Stack.dto.request.LoginRequestDTO;
 import kaua.AI_Dev_Stack.dto.response.LoginResponseDTO;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.repository.UserRepository;
 import kaua.AI_Dev_Stack.security.JwtService;
@@ -32,7 +33,7 @@ public class AuthService {
 
         // Busca o usuário
         User user = userRepository.findByEmailIgnoreCase(dto.email())
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         // Gera o token
         String token = jwtService.generateToken(user.getEmail());
