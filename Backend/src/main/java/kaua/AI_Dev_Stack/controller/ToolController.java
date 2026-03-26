@@ -6,7 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
+import kaua.AI_Dev_Stack.dto.response.FiltersResponseDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
+import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
+import kaua.AI_Dev_Stack.model.Enums.PricingType;
+import kaua.AI_Dev_Stack.model.Enums.StackType;
+import kaua.AI_Dev_Stack.model.Enums.ToolType;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.service.ToolService;
 import kaua.AI_Dev_Stack.service.UpvoteService;
@@ -15,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -74,5 +81,52 @@ public class ToolController {
     public ResponseEntity<Void> toggleUpvote(@PathVariable UUID toolId, @AuthenticationPrincipal User user) {
         upvoteService.toggleUpvote(user, toolId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/filters")
+    @Operation(
+            summary = "Get available filters",
+            description = "Returns all available filter options for pricing, tool type and stack"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Filters retrieved successfully")
+    })
+    public ResponseEntity<FiltersResponseDTO> getFilters() {
+        return ResponseEntity.ok(new FiltersResponseDTO(
+                PricingType.values(),
+                ToolType.values(),
+                StackType.values()
+        ));
+    }
+
+    @PatchMapping("/{toolId}/approve")
+    @Operation(
+            summary = "Approve tool",
+            description = "Approves a tool suggestion — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tool approved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tool not found")
+    })
+    public ResponseEntity<ToolResponseDTO> approve(@PathVariable UUID toolId){
+        return ResponseEntity.ok(toolService.approve(toolId));
+    }
+
+    @DeleteMapping("/{toolId}")
+    @Operation(
+            summary = "Delete tool",
+            description = "Permanently deletes a tool — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tool deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tool not found")
+    })
+    public ResponseEntity<Void> delete(@PathVariable UUID toolId){
+        toolService.delete(toolId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -45,11 +45,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Rotas públicas
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tools/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        // Rotas admin
+                        .requestMatchers(HttpMethod.DELETE, "/tools/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/tools/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/tags/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/tags/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 ).authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

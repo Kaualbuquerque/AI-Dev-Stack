@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tags")
@@ -80,5 +81,39 @@ public class TagController {
         TagResponseDTO response = tagMapper.toResponseDTO(tag);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(
+            summary = "Update tag",
+            description = "Updates an existing tag — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tag updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tag not found"),
+            @ApiResponse(responseCode = "409", description = "Tag with this name already exists")
+    })
+    public ResponseEntity<TagResponseDTO> update(UUID id, @Valid @RequestBody TagRequestDTO body){
+        Tag tag = tagService.update(id, body);
+        return ResponseEntity.ok(tagMapper.toResponseDTO(tag));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete tag",
+            description = "Permanently deletes a tag — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tag not found")
+    })
+    public ResponseEntity<Void> delete(UUID id){
+        tagService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

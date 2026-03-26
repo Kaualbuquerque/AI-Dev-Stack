@@ -76,4 +76,23 @@ public class ToolService {
                 votedToolIds.contains(tool.getId())
         ));
     }
+
+    @Transactional
+    public ToolResponseDTO approve(UUID toolId){
+        Tool tool = toolRepository.findById(toolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
+
+        tool.setApproved(true);
+        Tool savedTool = toolRepository.save(tool);
+
+        return toolMapper.toResponseDTO(savedTool, savedTool.getUpvotes().size(), false);
+    }
+
+    @Transactional
+    public void delete(UUID toolId) {
+        if (!toolRepository.existsById(toolId)) {
+            throw new ResourceNotFoundException("Tool not found");
+        }
+        toolRepository.deleteById(toolId);
+    }
 }
