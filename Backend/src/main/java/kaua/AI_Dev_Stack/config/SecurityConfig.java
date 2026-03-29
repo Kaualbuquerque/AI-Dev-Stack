@@ -47,10 +47,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Rotas públicas
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tools/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers("/sign-in", "/sign-up").permitAll()
                         // Rotas admin
                         .requestMatchers(HttpMethod.DELETE, "/tools/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/tools/**").hasRole("ADMIN")

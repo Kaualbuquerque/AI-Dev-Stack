@@ -34,3 +34,5 @@ build/
 
 # Ignore local configuration
 src/main/resources/application.properties
+
+src/main/java/kaua/AI_Dev_Stack/config/DataInitializer.java

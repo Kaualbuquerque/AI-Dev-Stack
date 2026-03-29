@@ -81,6 +81,9 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token")
     })
     public ResponseEntity<UserResponseDTO> getMe(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(userMapper.toResponseDTO(user));
     }
 
