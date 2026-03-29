@@ -14,8 +14,8 @@ import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/app/lib/utils";
 import { pricingConfig } from "@/app/types/princing";
 import { useState } from "react";
-import { userService } from "@/app/services/authservice";
 import { typeLabels } from "@/app/types/tool";
+import { useUser } from "@/app/lib/UserContext";
 
 export default function ToolDetails() {
 
@@ -24,20 +24,16 @@ export default function ToolDetails() {
     const [isUpvoting, setIsUpvoting] = useState(false);
     const toolName = params.get('name');
     const router = useRouter();
+    const { user, isLoading } = useUser();
 
     // Fetch tools
     const {
         data: tool,
-        isLoading: isLoading,
+        isLoading: isLoadingTool,
     } = useQuery<Tools[], Error, Tools | undefined>({
         queryKey: ['tools'],
         queryFn: () => toolsService.getAll().then(res => res.content || []),
         select: (data) => data.find((tool) => tool.name === toolName),
-    });
-
-    const { data: user } = useQuery({
-        queryKey: ["user"],
-        queryFn: () => userService.getUser(),
     });
 
     const handleUpvote = async () => {

@@ -5,13 +5,13 @@ import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/Select";
 import { Textarea } from "@/app/components/ui/Textarea";
+import { useUser } from "@/app/lib/UserContext";
 import { cn } from "@/app/lib/utils";
-import { userService } from "@/app/services/authservice";
 import { SuggestToolForm, toolsService } from "@/app/services/toolsService";
 import { PricingType } from "@/app/types/princing";
 import { ToolType } from "@/app/types/tool";
 import { createPageUrl } from "@/app/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowLeft, DollarSign, FileText, Globe, ImageIcon, Layers, Lightbulb, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +21,8 @@ import { toast } from "sonner";
 
 export default function SuggestTool() {
 
+    const router = useRouter();
+    const { user, isLoading } = useUser();
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState<SuggestToolForm>({
         name: '',
@@ -30,12 +32,7 @@ export default function SuggestTool() {
         pricingModel: '' as PricingType,
         toolType: '' as ToolType,
     });
-    const router = useRouter();
 
-    const { data: user, isLoading } = useQuery({
-        queryKey: ["user"],
-        queryFn: () => userService.getUser(),
-    });
 
     const { mutateAsync: submitTool, isPending: isSubmitting } = useMutation({
         mutationFn: (formData: SuggestToolForm) => {

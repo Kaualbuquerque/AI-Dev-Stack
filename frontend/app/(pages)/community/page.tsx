@@ -14,7 +14,6 @@ export default function Community() {
     // Fetch tools
     const {
         data: tools = [],
-        isLoading: isLoadingTools,
     } = useQuery<Tools[]>({
         queryKey: ['tools'],
         queryFn: () => toolsService.getAll().then(res => res.content || []),

@@ -4,10 +4,10 @@ import { Brain, Search, Sparkles, Menu, X, Compass, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './Button';
 import { createPageUrl } from '@/app/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { userService } from '@/app/services/authservice';
 import { useRouter } from 'next/navigation';
+import { userService } from '@/app/services/userService';
 
 interface HeaderProps {
     onOpenSearch: () => void;

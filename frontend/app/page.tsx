@@ -3,15 +3,15 @@
 import { motion } from "framer-motion";
 import HeroSection from "./components/home/HeroSection";
 import { Button } from "./components/ui/Button";
-import { ArrowUpDown, Cat, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowUpDown, Search, SlidersHorizontal } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/Select";
 import FilterSidebar from "./components/home/FilterSidebar";
 import ToolGrid from "./components/home/ToolGrid";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Tools, toolsService } from "./services/toolsService";
-import { userService } from "./services/authservice";
 import { FiltersData } from "./types/filter";
+import { Tools, toolsService } from "./services/toolsService";
+import { useUser } from "./lib/UserContext";
 
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { user, isLoading } = useUser();
 
   // Fetch tools
   const {
@@ -33,10 +34,7 @@ export default function Home() {
     select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
   });
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => userService.getUser(),
-  });
+
 
   // Filter and sort tools
   const filteredTools = useMemo(() => {

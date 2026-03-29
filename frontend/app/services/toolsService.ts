@@ -1,8 +1,7 @@
 import { apiFetch } from "../api/client";
+import { User } from "../types/auth";
 import { PricingType } from "../types/princing";
 import { ToolType } from "../types/tool";
-import { User } from "./authservice";
-
 interface PaginatedResponse<T> {
     content: T[];
 }

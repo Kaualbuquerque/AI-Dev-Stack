@@ -8,15 +8,17 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { Badge } from "@/app/components/ui/Badge";
 import { Tools, toolsService } from "@/app/services/toolsService";
-import { userService } from "@/app/services/authservice";
 import { Button } from "@/app/components/ui/Button";
 import { createPageUrl } from "@/app/utils";
 import { cn } from "@/app/lib/utils";
+import { useUser } from "@/app/lib/UserContext";
 
 export default function Profile() {
 
     const router = useRouter();
     const quaryClient = useQueryClient();
+
+    const { user, isLoading, clearUser } = useUser();
 
     // Fetch tools
     const {
@@ -26,11 +28,6 @@ export default function Profile() {
         queryFn: () => toolsService.getAll().then(res => res.content || []),
         // O "select" intercepta o dado e o entrega ordenado para a variável "tools"
         select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
-    });
-
-    const { data: user, isLoading } = useQuery({
-        queryKey: ["user"],
-        queryFn: () => userService.getUser(),
     });
 
     // Get tools user upvoted
@@ -44,8 +41,9 @@ export default function Profile() {
     }, [tools, user]);
 
     const handleLogout = () => {
+        clearUser();
         quaryClient.clear();
-        router.push("/");
+        router.push("/sign-in");
     };
 
     return (

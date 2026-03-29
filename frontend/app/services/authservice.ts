@@ -1,13 +1,20 @@
-import { apiFetch } from "../api/client"
+import { apiFetch } from "../api/client";
 
-export interface User {
-    email: string,
-    username: string,
-    createdAt: string
-    upvotedResourcesId: number[]
+export interface LoginRequest {
+    email: string;
+    password: string;
 }
 
-const email = "exemple@gmail.com"
-export const userService = {
-    getUser: () => apiFetch<User>(`/users/search?email=${email}`) 
+export interface LoginResponse {
+    token: string;
+    email: string;
+    username: string;
+}
+
+export const authService = {
+    login: (data: LoginRequest) =>
+        apiFetch<LoginResponse>('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }),
 }
