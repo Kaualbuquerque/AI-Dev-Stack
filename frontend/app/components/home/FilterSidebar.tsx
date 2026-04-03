@@ -1,11 +1,14 @@
-import { ChevronDown, RotateCcw, X } from "lucide-react";
+import { ChevronDown, DollarSign, Layers, Monitor, RotateCcw, X } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "../ui/Button";
 import { cn } from "@/app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Checkbox } from "../ui/Checkbox";
-import { FILTER_GROUPS as filterGroups } from "@/app/constants/filters";
 import { FiltersData } from "@/app/types/filter";
+import { useQuery } from "@tanstack/react-query";
+import { toolsService } from "@/app/services/toolsService";
+import Skeleton from "../ui/Skeleton";
+import { PricingType, pricingConfig } from "@/app/types/princing";
 
 interface FilterSidebarProps {
     filters: FiltersData,
@@ -16,7 +19,80 @@ interface FilterSidebarProps {
 }
 
 export default function FilterSidebar({ filters, setFilters, isOpen, onClose, isMobile = false }: FilterSidebarProps) {
-    const [expandedGroups, setExpandedGroups] = useState(['princing', 'stack', 'type']);
+    const [expandedGroups, setExpandedGroups] = useState(['pricing', 'stack', 'type']);
+
+    const { data: filtersData } = useQuery({
+        queryKey: ['filters'],
+        queryFn: () => toolsService.getFilters(),
+        staleTime: Infinity,
+    })
+
+    const filterGroups = filtersData ? [
+        {
+            id: 'pricing' as keyof FiltersData,
+            label: 'Pricing',
+            icon: DollarSign,
+            options: filtersData.pricingModels.map(p => {
+                const normalized = p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() as PricingType;
+
+                return {
+                    value: p,
+                    label: pricingConfig[normalized]?.label || normalized,
+                    color: normalized === 'Free'
+                        ? 'text-emerald-400'
+                        : normalized === 'Freemium'
+                            ? 'text-amber-400'
+                            : 'text-purple-400'
+                };
+            })
+        },
+        {
+            id: 'stack' as keyof FiltersData,
+            label: 'Tech Stack',
+            icon: Layers,
+            options: filtersData.stacks.map(s => ({
+                value: s,
+                label: s.charAt(0) + s.slice(1).toLowerCase(),
+                color: undefined
+            }))
+        },
+        {
+            id: 'type' as keyof FiltersData,
+            label: 'Tool Type',
+            icon: Monitor,
+            options: filtersData.toolTypes.map(t => ({
+                value: t,
+                label: t.charAt(0).toUpperCase() + t.slice(1).toLowerCase(),
+                color: undefined
+            }))
+        }
+    ] : [];
+
+
+    if (!filtersData) {
+        if (isMobile) return null; // no mobile não mostra nada enquanto carrega
+
+        return (
+            <aside className='hidden lg:block w-64 shrink-0'>
+                <div className='sticky top-24 p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50'>
+                    <div className="space-y-6">
+                        <Skeleton className="h-6 w-24 bg-slate-700" />
+                        <div className="space-y-3 pt-4 border-t border-slate-800">
+                            <Skeleton className="h-4 w-32 bg-slate-700" />
+                            <Skeleton className="h-4 w-full bg-slate-700" />
+                            <Skeleton className="h-4 w-full bg-slate-700" />
+                            <Skeleton className="h-4 w-3/4 bg-slate-700" />
+                        </div>
+                        <div className="space-y-3 pt-4 border-t border-slate-800">
+                            <Skeleton className="h-4 w-24 bg-slate-700" />
+                            <Skeleton className="h-4 w-full bg-slate-700" />
+                            <Skeleton className="h-4 w-full bg-slate-700" />
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        );
+    }
 
     const toggleGroup = (groupId: string) => {
         setExpandedGroups((prev) =>
@@ -45,7 +121,7 @@ export default function FilterSidebar({ filters, setFilters, isOpen, onClose, is
     };
 
     const hasActiveFilters = Object.values(filters).some(arr => arr.length > 0);
-
+    
     const sidebarContent = (
         <div className='space-y-6'>
 

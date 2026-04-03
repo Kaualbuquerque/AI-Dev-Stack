@@ -13,10 +13,10 @@ const trendingTags = [
 
 interface HeroSectionProps {
     onTagClick: (tagName: string) => void;
-    activeCat: string | null;
+    activeTag: string | null;
 }
 
-export default function HeroSection({ onTagClick, activeCat }: HeroSectionProps) {
+export default function HeroSection({ onTagClick, activeTag }: HeroSectionProps) {
     return (
         <section className='relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-16'>
             {/* Background Effects */}
@@ -57,7 +57,7 @@ export default function HeroSection({ onTagClick, activeCat }: HeroSectionProps)
                 >
                     {trendingTags.map((tag, index) => {
                         const Icon = tag.icon;
-                        const isActive = activeCat === tag.label;
+                        const isActive = activeTag === tag.label;
                         return (
                             <motion.button
                                 key={tag.label}

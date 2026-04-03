@@ -12,29 +12,32 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiltersData } from "./types/filter";
 import { Tools, toolsService } from "./services/toolsService";
 import { useUser } from "./lib/UserContext";
+import { cn } from "./lib/utils";
 
 
 export default function Home() {
 
   const [filters, setFilters] = useState<FiltersData>({ pricing: [], stack: [], type: [] });
-  const [sortBy, setSortBy] = useState('upvotes');
-  const [activeCat, setActiveCat] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [sortBy, setSortBy] = useState('upvotes');
   const queryClient = useQueryClient();
   const { user, isLoading } = useUser();
+  const PAGE_SIZE = 12;
 
   // Fetch tools
   const {
-    data: tools = [],
-  } = useQuery<Tools[]>({
-    queryKey: ["tools"],
-    queryFn: () => toolsService.getAll().then(res => res.content || []),
-    // O "select" intercepta o dado e o entrega ordenado para a variável "tools"
-    select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
+    data: toolsPage,
+    isLoading: isLoadingTools,
+  } = useQuery({
+    queryKey: ["tools", currentPage], // ✅ queryKey inclui a página
+    queryFn: () => toolsService.getAll(currentPage, PAGE_SIZE),
   });
 
-
+  const totalPages = toolsPage?.totalPages || 0;
+  const tools = toolsPage?.content || [];
 
   // Filter and sort tools
   const filteredTools = useMemo(() => {
@@ -46,22 +49,35 @@ export default function Home() {
       result = result.filter(tool =>
         tool.name?.toLowerCase().includes(query) ||
         tool.description?.toLowerCase().includes(query) ||
-        tool.categories?.some(cat => cat.name.toLowerCase().includes(query))
+        tool.tags?.some(tag => tag.name.toLowerCase().includes(query))
       );
     }
 
     // Tag filter from hero
-    if (activeCat) {
+    if (activeTag) {
       result = result.filter(tool =>
-        tool.categories?.some(cat => cat.name.toLowerCase().includes(activeCat.toLowerCase()))
+        tool.tags?.some(tag => tag.name.toLowerCase().includes(activeTag.toLowerCase()))
       );
     }
 
     // Pricing filter
     if (filters.pricing.length > 0) {
-      result = result.filter(tool => filters.pricing.includes(tool.pricingModel));
+      result = result.filter(tool =>
+        filters.pricing.some(p =>
+          p.toLowerCase() === tool.pricingModel.toLowerCase()
+        )
+      );
     }
 
+    if (filters.stack.length > 0) {
+      result = result.filter(tool =>
+        tool.stacks?.some(stack =>
+          filters.stack.some(f =>
+            f.toLowerCase() === stack.toLowerCase()
+          )
+        )
+      );
+    }
 
     // Type filter
     if (filters.type.length > 0) {
@@ -84,7 +100,7 @@ export default function Home() {
     }
 
     return result;
-  }, [tools, searchQuery, activeCat, filters, sortBy]);
+  }, [tools, searchQuery, activeTag, filters, sortBy]);
 
   const handleUpvote = (toolId: number, newUpvotesCount: number, newVotedByMe: boolean) => {
     queryClient.setQueryData<Tools[]>(['tools'], (oldTools) =>
@@ -97,18 +113,18 @@ export default function Home() {
   };
 
   const handleCatClick = (cat: any) => {
-    setActiveCat(activeCat === cat ? null : cat);
+    setActiveTag(activeTag === cat ? null : cat);
   };
 
   const activeFiltersCount =
     filters.pricing.length +
     filters.stack.length +
     filters.type.length +
-    (activeCat ? 1 : 0);
+    (activeTag ? 1 : 0);
 
   return (
     <div className="min-h-screen">
-      <HeroSection onTagClick={handleCatClick} activeCat={activeCat} />
+      <HeroSection onTagClick={handleCatClick} activeTag={activeTag} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Controls Bar */}
@@ -198,7 +214,49 @@ export default function Home() {
               onUpvote={handleUpvote}
             />
           </div>
+
+
+
         </div>
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+              disabled={currentPage === 0}
+              className="border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+            >
+              Previous
+            </Button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i)}
+                  className={cn(
+                    "w-9 h-9 rounded-lg text-sm font-medium transition-all",
+                    currentPage === i
+                      ? "bg-cyan-500 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  )}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={currentPage === totalPages - 1}
+              className="border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

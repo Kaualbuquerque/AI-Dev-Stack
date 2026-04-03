@@ -1,10 +1,17 @@
 import { apiFetch } from "../api/client";
 import { User } from "../types/auth";
+import { FiltersResponse } from "../types/filter";
 import { PricingType } from "../types/princing";
 import { ToolType } from "../types/tool";
-interface PaginatedResponse<T> {
+export interface PaginatedResponse<T> {
     content: T[];
+    totalPages: number;
+    totalElements: number;
+    number: number;
+    size: number;
+    last: boolean;
 }
+
 export interface SuggestToolForm {
     name: string;
     description: string;
@@ -22,7 +29,8 @@ export interface Tools {
     thumbnailUrl: string;
     pricingModel: PricingType;
     toolType: ToolType; // Novo campo integrado
-    categories: {
+    stacks: string[];
+    tags: {
         name: string;
         slug: string;
         iconKey: string;
@@ -36,13 +44,14 @@ export interface Tools {
 }
 
 export const toolsService = {
-    // 2. Informe que o retorno é o objeto que CONTÉM o array de Tools
-    getAll: () => apiFetch<PaginatedResponse<Tools>>('/tools'),
-    // Adicione quando souber o endpoint correto
+    getAll: (page = 0, size = 12) =>
+        apiFetch<PaginatedResponse<Tools>>(`/tools?page=${page}&size=${size}`),
+    getFilters: () => apiFetch<FiltersResponse>('/tools/filters'),
     upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     removeUpvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'DELETE' }),
     suggest: (formData: SuggestToolForm) => apiFetch<Tools>('/tools', {
         method: 'POST',
         body: JSON.stringify(formData)
     }),
+
 }

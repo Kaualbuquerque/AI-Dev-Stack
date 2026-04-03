@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useState } from "react";
-import { pricingConfig } from "@/app/types/princing";
+import { PricingType, pricingConfig } from "@/app/types/princing";
 import { typeIcons } from "@/app/types/tool";
 
 
@@ -57,7 +57,10 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
         }
     };
 
-    const princig = pricingConfig[tool.pricingModel] || pricingConfig.Free;
+    const normalizedPricing = tool.pricingModel
+        ? (tool.pricingModel.charAt(0).toUpperCase() + tool.pricingModel.slice(1).toLowerCase()) as PricingType
+        : 'Free';
+    const pricing = pricingConfig[normalizedPricing] || pricingConfig['Free'];
 
     return (
         <motion.div
@@ -88,8 +91,8 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
 
                     {/* Pricing Badge */}
                     <div className='absolute top-4 right-4'>
-                        <Badge variant='outline' className={cn('text-xs', princig.className)}>
-                            {princig.label}
+                        <Badge variant='outline' className={cn('text-xs', pricing.className)}>
+                            {pricing.label}
                         </Badge>
                     </div>
 
@@ -125,15 +128,15 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
 
                     {/* Tags */}
                     <div className='flex flex-wrap gap-1.5 mb-4 min-h-7'>
-                        {(tool.categories || []).slice(0, 3).map((cat) => (
-                            <span key={cat.slug} className='inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-400 bg-slate-700/50 rounded-md'>
+                        {(tool.tags || []).slice(0, 3).map((tag) => (
+                            <span key={tag.slug} className='inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-400 bg-slate-700/50 rounded-md'>
                                 <Tag className='w-2.5 h-2.5' />
-                                {cat.name}
+                                {tag.name}
                             </span>
                         ))}
-                        {(tool.categories || []).length > 3 && (
+                        {(tool.tags || []).length > 3 && (
                             <span className='text-xs text-slate-500'>
-                                +{tool.categories.length - 3}
+                                +{tool.tags.length - 3}
                             </span>
                         )}
                     </div>

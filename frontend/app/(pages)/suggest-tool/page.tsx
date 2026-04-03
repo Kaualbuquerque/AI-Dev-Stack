@@ -5,6 +5,7 @@ import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/Select";
 import { Textarea } from "@/app/components/ui/Textarea";
+import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 import { useUser } from "@/app/lib/UserContext";
 import { cn } from "@/app/lib/utils";
 import { SuggestToolForm, toolsService } from "@/app/services/toolsService";
@@ -21,8 +22,9 @@ import { toast } from "sonner";
 
 export default function SuggestTool() {
 
+    useRequireAuth();
     const router = useRouter();
-    const { user, isLoading } = useUser();
+    const { user } = useUser();
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState<SuggestToolForm>({
         name: '',
@@ -36,16 +38,13 @@ export default function SuggestTool() {
 
     const { mutateAsync: submitTool, isPending: isSubmitting } = useMutation({
         mutationFn: (formData: SuggestToolForm) => {
-            console.log('Enviando ferramenta:', formData); // ✅ mostra o que está sendo enviado
             return toolsService.suggest(formData);
         },
         onSuccess: (response) => {
-            console.log('Resposta do backend:', response); // ✅ mostra a resposta
             setSubmitted(true);
             toast.success("Tool submitted successfully!");
         },
         onError: (error) => {
-            console.error('Erro ao enviar:', error); // ✅ mostra o erro completo
             toast.error("Failed to submit. Please try again later.");
         }
     });

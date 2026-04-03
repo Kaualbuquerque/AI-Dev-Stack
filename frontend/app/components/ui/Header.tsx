@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { userService } from '@/app/services/userService';
+import { useUser } from '@/app/lib/UserContext';
 
 interface HeaderProps {
     onOpenSearch: () => void;
@@ -16,12 +17,7 @@ interface HeaderProps {
 export default function Header({ onOpenSearch }: HeaderProps) {
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    const { data: user, isLoading } = useQuery({
-        queryKey: ["user"],
-        queryFn: () => userService.getUser(),
-    });
-
+    const { user } = useUser();
     const router = useRouter();
 
     return (
@@ -105,7 +101,7 @@ export default function Header({ onOpenSearch }: HeaderProps) {
                 <div className="md:hidden glass-effect border-t border-slate-800">
                     <div className="px-4 py-4 space-y-3">
                         <button
-                            onClick={() => { onOpenSearch; setMobileMenuOpen(false); }}
+                            onClick={() => { onOpenSearch(); setMobileMenuOpen(false); }}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400"
                         >
                             <Search className="w-4 h-4" />

@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/app/lib/utils";
-import { pricingConfig } from "@/app/types/princing";
+import { PricingType, pricingConfig } from "@/app/types/princing";
 import { useState } from "react";
 import { typeLabels } from "@/app/types/tool";
 import { useUser } from "@/app/lib/UserContext";
@@ -111,7 +111,10 @@ export default function ToolDetails() {
     }
 
 
-    const pricing = pricingConfig[tool.pricingModel] ?? pricingConfig['Free'];
+    const normalizedPricing = tool.pricingModel
+        ? (tool.pricingModel.charAt(0).toUpperCase() + tool.pricingModel.slice(1).toLowerCase()) as PricingType
+        : 'Free';
+    const pricing = pricingConfig[normalizedPricing] ?? pricingConfig['Free'];
 
     return (
         <div className="min-h-screen py-8">
@@ -237,44 +240,44 @@ export default function ToolDetails() {
                     className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"
                 >
                     {/* Tech Stack */}
-                    {tool.categories && tool.categories.length > 0 && (
+                    {tool.stacks && tool.stacks.length > 0 && (
                         <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <Layers className="w-5 h-5 text-cyan-400" />
                                 <h3 className="font-semibold text-white">Compatible Stack</h3>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                {tool.categories.map((tech) => (
+                                {tool.stacks.map((stack) => (
                                     <Badge
-                                        key={tech.name}
+                                        key={stack}
                                         variant="outline"
                                         className="bg-slate-700/50 border-slate-600 text-slate-300 capitalize"
                                     >
-                                        {tech.name}
+                                        {stack.charAt(0) + stack.slice(1).toLowerCase()}
                                     </Badge>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {/* categories */}
-                    {tool.categories && tool.categories.length > 0 && (
+                    {/* tags */}
+                    {tool.tags && tool.tags.length > 0 && (
                         <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <Tag className="w-5 h-5 text-purple-400" />
-                                <h3 className="font-semibold text-white">Categories</h3>
+                                <h3 className="font-semibold text-white">Tags</h3>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                {tool.categories.map((cat) => (
+                                {tool.tags.map((tag) => (
                                     <Link
-                                        key={cat.name}
-                                        href={createPageUrl('Home') + `?search=${encodeURIComponent(cat.name)}`}
+                                        key={tag.name}
+                                        href={createPageUrl('Home') + `?search=${encodeURIComponent(tag.name)}`}
                                     >
                                         <Badge
                                             variant="outline"
                                             className="bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 cursor-pointer transition-colors"
                                         >
-                                            #{cat.name}
+                                            #{tag.name}
                                         </Badge>
                                     </Link>
                                 ))}

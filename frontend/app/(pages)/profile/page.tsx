@@ -12,12 +12,13 @@ import { Button } from "@/app/components/ui/Button";
 import { createPageUrl } from "@/app/utils";
 import { cn } from "@/app/lib/utils";
 import { useUser } from "@/app/lib/UserContext";
+import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 
 export default function Profile() {
 
+    useRequireAuth()
     const router = useRouter();
     const quaryClient = useQueryClient();
-
     const { user, isLoading, clearUser } = useUser();
 
     // Fetch tools

@@ -8,6 +8,12 @@ export interface FiltersData {
     type: ToolType[];
 }
 
+export interface FiltersResponse {
+    pricingModels: string[];
+    toolTypes: string[];
+    stacks: string[];
+}
+
 export interface FilterOption {
     value: string;
     label: string;
