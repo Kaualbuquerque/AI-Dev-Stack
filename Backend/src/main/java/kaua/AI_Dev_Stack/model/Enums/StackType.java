@@ -10,5 +10,6 @@ public enum StackType {
     CSHARP,
     RUBY,
     PHP,
-    SWIFT
+    SWIFT,
+    KOTLIN
 }
