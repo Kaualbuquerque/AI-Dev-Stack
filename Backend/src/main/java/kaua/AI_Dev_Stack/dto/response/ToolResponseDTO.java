@@ -48,6 +48,9 @@ public record ToolResponseDTO(
         @Schema(description = "Total number of upvotes.", example = "42")
         int upvotesCount,
 
+        @Schema(description = "Email of the user who suggested the tool.")
+        String userEmail,
+
         @Schema(description = "List of tags this tool belongs to.")
         List<TagResponseDTO> tags
 ) {

@@ -4,39 +4,56 @@ services:
     image: postgres:15-alpine
     container_name: postgres-db
     environment:
-      - POSTGRES_DB=meu_banco
-      - POSTGRES_USER=usuario
-      - POSTGRES_PASSWORD=senha
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Serviço do pgAdmin (Para você não precisar instalar nada no Windows)
+  # Serviço do pgAdmin
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin-container
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
       - "8082:80"
     depends_on:
       - db
 
-  # Seu Backend Spring Boot
+  # Backend Spring Boot
   app:
     build: .
     container_name: ai-dev-stack-backend
     ports:
       - "8081:8081"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/meu_banco
-      - SPRING_DATASOURCE_USERNAME=usuario
-      - SPRING_DATASOURCE_PASSWORD=senha
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # Banco de dados
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+
+      # DataInitializer
+      - DATA_INIT_ADMIN_EMAIL=${ADMIN_EMAIL}
+      - DATA_INIT_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DATA_INIT_USER_EMAIL=${USER_EMAIL}
+      - DATA_INIT_USER_PASSWORD=${USER_PASSWORD}
 
 volumes:
   pgdata:
