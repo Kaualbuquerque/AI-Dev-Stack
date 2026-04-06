@@ -16,7 +16,6 @@ import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 
 export default function Profile() {
 
-    useRequireAuth()
     const router = useRouter();
     const quaryClient = useQueryClient();
     const { user, isLoading, clearUser } = useUser();
@@ -38,7 +37,7 @@ export default function Profile() {
 
     const suggestions = useMemo(() => {
         if (!user?.email) return [];
-        return tools.filter(tool => tool.user.email === user.email);
+        return tools.filter(tool => tool.userEmail === user.email);
     }, [tools, user]);
 
     const handleLogout = () => {
@@ -46,6 +45,10 @@ export default function Profile() {
         quaryClient.clear();
         router.push("/sign-in");
     };
+
+
+    useRequireAuth()
+    if (!user && !isLoading) return null;
 
     return (
         <div className="min-h-screen py-12">
@@ -78,7 +81,7 @@ export default function Profile() {
                                     </span>
                                     <span className="flex items-center gap-2">
                                         <Calendar className="w-4 h-4" />
-                                        Joined {isLoading ? "..." : new Date(user!.createdAt).toLocaleDateString()}
+                                        Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "..."}
                                     </span>
                                 </div>
                             </div>
@@ -183,7 +186,7 @@ export default function Profile() {
                                             suggestion.isApproved === false && "bg-red-500/20 text-red-400 border-red-500/30"
                                         )}
                                     >
-                                        {suggestion.isApproved}
+                                        {suggestion.isApproved ? "Approved" : "Pending"}
                                     </Badge>
                                 </div>
                             ))}

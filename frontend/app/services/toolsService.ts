@@ -40,6 +40,7 @@ export interface Tools {
     featured: boolean;
     upvotesCount: number;    // Contador de Upvotes (em vez de carregar a lista toda de objetos Upvote)
     votedByMe: boolean;
+    userEmail: string;
     createdAt: string; // Datas no JSON costumam vir como string (ISO 8601)
 }
 
