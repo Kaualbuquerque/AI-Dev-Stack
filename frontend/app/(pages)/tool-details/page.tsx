@@ -51,11 +51,7 @@ export default function ToolDetails() {
                 ? tool.upvotesCount - 1
                 : tool.upvotesCount + 1;
 
-            if (tool.votedByMe) {
-                await toolsService.removeUpvote(tool.id);
-            } else {
-                await toolsService.upvote(tool.id);
-            }
+            await toolsService.upvote(tool.id);
 
             queryClient.setQueryData<Tools[]>(['tools'], (oldTools) =>
                 oldTools?.map(t =>
