@@ -163,7 +163,7 @@ export default function Profile() {
                         transition={{ delay: 0.2 }}
                         className="mt-8 bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6"
                     >
-                        <div className="flex items-center gap-3 mb6">
+                        <div className="flex items-center gap-3 mb-6">
                             <Sparkles className="w-5 h-5 text-purple-400" />
                             <h2 className="text-lg font-bold text-white">Your Suggestions</h2>
                         </div>

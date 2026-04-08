@@ -37,5 +37,10 @@ export async function apiFetch<T>(endpoint: string, options?: RequestInit): Prom
     throw new Error(errorData?.message || `API Error: ${response.statusText}`);
   }
 
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    return null as T; // respostas vazias (204, 200 sem body)
+  }
+
   return response.json();
 }

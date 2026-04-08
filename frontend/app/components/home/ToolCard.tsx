@@ -28,30 +28,22 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
         e.preventDefault();
         e.stopPropagation();
 
-        if (!userEmail) return; // redirecionar para login quando tiver auth
+        if (!userEmail) return;
 
         setIsUpvoting(true);
         try {
             const newVotedByMe = !hasUpvoted;
             const newUpvotesCount = hasUpvoted ? localUpvotes - 1 : localUpvotes + 1;
 
-            // Chama o endpoint correto baseado no estado atual
-            if (hasUpvoted) {
-                await toolsService.removeUpvote(tool.id);
-            } else {
-                await toolsService.upvote(tool.id);
-            }
+            await toolsService.upvote(tool.id);
 
-            // Atualiza estado local
             setLocalUpvotes(newUpvotesCount);
             setHasUpvoted(newVotedByMe);
 
-            // Atualiza cache do TanStack Query na Home
             if (onUpvote) onUpvote(tool.id, newUpvotesCount, newVotedByMe);
 
         } catch (error) {
             console.error('Failed to upvote:', error);
-            // Reverte em caso de erro — não altera nada
         } finally {
             setIsUpvoting(false);
         }

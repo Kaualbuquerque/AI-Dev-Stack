@@ -3,6 +3,7 @@ import { User } from "../types/auth";
 import { FiltersResponse } from "../types/filter";
 import { PricingType } from "../types/princing";
 import { ToolType } from "../types/tool";
+
 export interface PaginatedResponse<T> {
     content: T[];
     totalPages: number;
@@ -49,7 +50,6 @@ export const toolsService = {
         apiFetch<PaginatedResponse<Tools>>(`/tools?page=${page}&size=${size}`),
     getFilters: () => apiFetch<FiltersResponse>('/tools/filters'),
     upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
-    removeUpvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'DELETE' }),
     suggest: (formData: SuggestToolForm) => apiFetch<Tools>('/tools', {
         method: 'POST',
         body: JSON.stringify(formData)
