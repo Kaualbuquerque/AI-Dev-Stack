@@ -13,6 +13,15 @@ export interface PaginatedResponse<T> {
     last: boolean;
 }
 
+export interface ToolFilters {
+    search?: string;
+    pricing?: string;
+    type?: string;
+    stack?: string[];
+    sort?: string;
+    tag?: string;
+}
+
 export interface SuggestToolForm {
     name: string;
     description: string;
@@ -46,13 +55,38 @@ export interface Tools {
 }
 
 export const toolsService = {
-    getAll: (page = 0, size = 12) =>
-        apiFetch<PaginatedResponse<Tools>>(`/tools?page=${page}&size=${size}`),
+    getAll: (page = 0, size = 12, filters?: ToolFilters) => {
+        const params = new URLSearchParams();
+        params.set('page', String(page));
+        params.set('size', String(size));
+
+        if (filters?.search) params.set('search', filters.search);
+        if (filters?.pricing) params.set('pricing', filters.pricing);
+        if (filters?.type) params.set('type', filters.type);
+        if (filters?.stack?.length) {
+            filters.stack.forEach(s => params.append('stack', s));
+        }
+        if (filters?.tag) params.set('tag', filters.tag);
+        if (filters?.sort) {
+            switch (filters.sort) {
+                case 'upvotes':
+                    params.set('sort', 'upvotesCount,desc');
+                    break;
+                case 'newest':
+                    params.set('sort', 'createdAt,desc');
+                    break;
+                case 'name':
+                    params.set('sort', 'name,asc');
+                    break;
+            }
+        }
+        return apiFetch<PaginatedResponse<Tools>>(`/tools?${params.toString()}`);
+    },
     getFilters: () => apiFetch<FiltersResponse>('/tools/filters'),
     upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     suggest: (formData: SuggestToolForm) => apiFetch<Tools>('/tools', {
         method: 'POST',
         body: JSON.stringify(formData)
     }),
-
+    getVotedByMe: () => apiFetch<PaginatedResponse<Tools>>(`/tools?votedByMe=true&size=100`),
 }

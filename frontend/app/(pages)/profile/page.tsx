@@ -25,8 +25,7 @@ export default function Profile() {
         data: tools = [],
     } = useQuery<Tools[]>({
         queryKey: ["tools"],
-        queryFn: () => toolsService.getAll().then(res => res.content || []),
-        // O "select" intercepta o dado e o entrega ordenado para a variável "tools"
+        queryFn: () => toolsService.getVotedByMe().then(res => res.content || []),
         select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
     });
 

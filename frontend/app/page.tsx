@@ -28,92 +28,36 @@ export default function Home() {
   const PAGE_SIZE = 12;
 
   // Fetch tools
-  const {
-    data: toolsPage,
-    isLoading: isLoadingTools,
-  } = useQuery({
-    queryKey: ["tools", currentPage], // ✅ queryKey inclui a página
-    queryFn: () => toolsService.getAll(currentPage, PAGE_SIZE),
+  const { data: toolsPage, isLoading: isLoadingTools } = useQuery({
+    queryKey: ["tools", currentPage, filters, searchQuery, sortBy, activeTag],
+    queryFn: () => {
+      return toolsService.getAll(currentPage, PAGE_SIZE, {
+        search: searchQuery || undefined,
+        pricing: filters.pricing[0] || undefined,
+        type: filters.type[0] || undefined,
+        stack: filters.stack.length > 0 ? filters.stack : undefined,
+        sort: sortBy || undefined,
+        tag: activeTag || undefined,
+      });
+    },
   });
 
   const totalPages = toolsPage?.totalPages || 0;
   const tools = toolsPage?.content || [];
 
-  // Filter and sort tools
-  const filteredTools = useMemo(() => {
-    let result = [...tools];
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(tool =>
-        tool.name?.toLowerCase().includes(query) ||
-        tool.description?.toLowerCase().includes(query) ||
-        tool.tags?.some(tag => tag.name.toLowerCase().includes(query))
-      );
-    }
-
-    // Tag filter from hero
-    if (activeTag) {
-      result = result.filter(tool =>
-        tool.tags?.some(tag => tag.name.toLowerCase().includes(activeTag.toLowerCase()))
-      );
-    }
-
-    // Pricing filter
-    if (filters.pricing.length > 0) {
-      result = result.filter(tool =>
-        filters.pricing.some(p =>
-          p.toLowerCase() === tool.pricingModel.toLowerCase()
-        )
-      );
-    }
-
-    if (filters.stack.length > 0) {
-      result = result.filter(tool =>
-        tool.stacks?.some(stack =>
-          filters.stack.some(f =>
-            f.toLowerCase() === stack.toLowerCase()
-          )
-        )
-      );
-    }
-
-    // Type filter
-    if (filters.type.length > 0) {
-      result = result.filter(tool => filters.type.includes(tool.toolType));
-    }
-
-    // Sort
-    switch (sortBy) {
-      case 'upvotes':
-        result.sort((a, b) => (b.upvotesCount || 0) - (a.upvotesCount || 0));
-        break;
-      case 'newest':
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case 'name':
-        result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-        break;
-      default:
-        break;
-    }
-
-    return result;
-  }, [tools, searchQuery, activeTag, filters, sortBy]);
-
-  const handleUpvote = (toolId: number, newUpvotesCount: number, newVotedByMe: boolean) => {
-    queryClient.setQueryData<Tools[]>(['tools'], (oldTools) =>
-      oldTools?.map(tool =>
-        tool.id === toolId
-          ? { ...tool, upvotesCount: newUpvotesCount, votedByMe: newVotedByMe }
-          : tool
-      )
-    );
+  const handleUpvote = () => {
+    queryClient.invalidateQueries({ queryKey: ["tools"] });
   };
 
-  const handleCatClick = (cat: any) => {
-    setActiveTag(activeTag === cat ? null : cat);
+  const handleFilterChange = (newFilters: FiltersData) => {
+    setFilters(newFilters);
+    setCurrentPage(0);
+  };
+
+  const handleTagClick = (tag: string) => {
+    const newTag = activeTag === tag ? null : tag;
+    setActiveTag(newTag);
+    setCurrentPage(0);
   };
 
   const activeFiltersCount =
@@ -124,7 +68,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <HeroSection onTagClick={handleCatClick} activeTag={activeTag} />
+      <HeroSection onTagClick={handleTagClick} activeTag={activeTag} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Controls Bar */}
@@ -150,7 +94,7 @@ export default function Home() {
             </Button>
 
             <span className="text-slate-400 text-sm">
-              Displaying <span className="text-white font-medium">{filteredTools.length}</span> AI tools
+              Displaying <span className="text-white font-medium">{tools.length}</span> AI tools
             </span>
           </div>
 
@@ -171,7 +115,10 @@ export default function Home() {
               </div>
             )}
 
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={sortBy} onValueChange={(value) => {
+              setSortBy(value);
+              setCurrentPage(0);
+            }}>
               <SelectTrigger className="w-44 bg-slate-800/50 border-slate-700 text-slate-300">
                 <ArrowUpDown className="w-4 h-4 mr-2 text-slate-400" />
                 <SelectValue />
@@ -199,7 +146,7 @@ export default function Home() {
           {/* Mobile Sidebar */}
           <FilterSidebar
             filters={filters}
-            setFilters={setFilters}
+            setFilters={handleFilterChange}
             isOpen={mobileFiltersOpen}
             onClose={() => setMobileFiltersOpen(false)}
             isMobile={true}
@@ -208,7 +155,7 @@ export default function Home() {
           {/* Tools Grid */}
           <div className="flex-1 min-w-0">
             <ToolGrid
-              tools={filteredTools}
+              tools={tools}
               isLoading={isLoading}
               userEmail={user?.email || ""}
               onUpvote={handleUpvote}

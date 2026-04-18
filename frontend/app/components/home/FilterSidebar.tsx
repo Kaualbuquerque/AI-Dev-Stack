@@ -12,7 +12,7 @@ import { PricingType, pricingConfig } from "@/app/types/princing";
 
 interface FilterSidebarProps {
     filters: FiltersData,
-    setFilters: Dispatch<SetStateAction<FiltersData>>,
+    setFilters: (filters: FiltersData) => void,
     isOpen: boolean,
     onClose?: () => void,
     isMobile: boolean;
@@ -103,16 +103,15 @@ export default function FilterSidebar({ filters, setFilters, isOpen, onClose, is
     };
 
     const toggleFilter = (groupId: keyof FiltersData, value: string) => {
-        setFilters((prev) => {
-            const currentValues = prev[groupId] as string[];
-            const isSelected = currentValues.includes(value);
-            const newValues = isSelected
-                ? currentValues.filter((v) => v !== value)
-                : [...currentValues, value];
-            return {
-                ...prev,
-                [groupId]: newValues
-            };
+        const currentValues = filters[groupId] as string[];
+        const isSelected = currentValues.includes(value);
+        const newValues = isSelected
+            ? currentValues.filter((v) => v !== value)
+            : [...currentValues, value];
+
+        setFilters({
+            ...filters,
+            [groupId]: newValues
         });
     };
 
@@ -121,7 +120,7 @@ export default function FilterSidebar({ filters, setFilters, isOpen, onClose, is
     };
 
     const hasActiveFilters = Object.values(filters).some(arr => arr.length > 0);
-    
+
     const sidebarContent = (
         <div className='space-y-6'>
 
