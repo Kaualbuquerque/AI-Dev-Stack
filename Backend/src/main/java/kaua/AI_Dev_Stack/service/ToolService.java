@@ -9,9 +9,11 @@ import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.repository.TagRepository;
 import kaua.AI_Dev_Stack.repository.ToolRepository;
+import kaua.AI_Dev_Stack.repository.ToolSpecification;
 import kaua.AI_Dev_Stack.repository.UpvoteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,36 +58,42 @@ public class ToolService {
         Tool savedTool = toolRepository.save(tool);
 
         // Retorna o DTO - votedByMe false e upvotesCount 0 para nova ferramenta
-        return toolMapper.toResponseDTO(savedTool, 0, false);
+        return toolMapper.toResponseDTO(savedTool, false);
     }
 
     @Transactional(readOnly = true)
-    public Page<ToolResponseDTO> findAllApproved(Pageable pageable, User currentUser) {
-        // Busca as tools paginadas
-        Page<Tool> tools = toolRepository.findByIsApprovedTrue(pageable);
+    public Page<ToolResponseDTO> findAllApproved(
+            Pageable pageable,
+            User currentUser,
+            String search,
+            String pricing,
+            String type,
+            List<String> stack,
+            String tag,
+            Boolean votedByMe) {
 
-        // Busca os IDs das tools que o usuário votou - uma única query
+        Specification<Tool> spec = ToolSpecification.withFilters(search, pricing, type, stack, tag, votedByMe, currentUser);
+        Page<Tool> tools = toolRepository.findAll(spec, pageable);
+
         Set<UUID> votedToolIds = currentUser != null
                 ? upvoteRepository.findToolIdsByUserId(currentUser.getId())
                 : Set.of();
 
-        // Mapeia cada tool para DTO calculando upvotesCount e votedByMe
         return tools.map(tool -> toolMapper.toResponseDTO(
                 tool,
-                tool.getUpvotes().size(),
                 votedToolIds.contains(tool.getId())
         ));
     }
 
     @Transactional
-    public ToolResponseDTO approve(UUID toolId){
+    public ToolResponseDTO approve(UUID toolId) {
         Tool tool = toolRepository.findById(toolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
 
         tool.setApproved(true);
         Tool savedTool = toolRepository.save(tool);
 
-        return toolMapper.toResponseDTO(savedTool, savedTool.getUpvotes().size(), false);
+        return toolMapper.toResponseDTO(savedTool, false);
     }
 
     @Transactional

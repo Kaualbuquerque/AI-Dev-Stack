@@ -24,6 +24,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -64,8 +65,16 @@ public class ToolController {
             @ApiResponse(responseCode = "200", description = "Tools list retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "System failed to fetch tools list")
     })
-    public ResponseEntity<Page<ToolResponseDTO>> findAll(Pageable pageable, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(toolService.findAllApproved(pageable, user));
+    public ResponseEntity<Page<ToolResponseDTO>> findAll(
+            Pageable pageable,
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String pricing,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) List<String> stack,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) Boolean votedByMe) {
+        return ResponseEntity.ok(toolService.findAllApproved(pageable, user, search, pricing, type, stack, tag, votedByMe));
     }
 
     @PostMapping("/{toolId}/upvote")
@@ -110,7 +119,7 @@ public class ToolController {
             @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
             @ApiResponse(responseCode = "404", description = "Tool not found")
     })
-    public ResponseEntity<ToolResponseDTO> approve(@PathVariable UUID toolId){
+    public ResponseEntity<ToolResponseDTO> approve(@PathVariable UUID toolId) {
         return ResponseEntity.ok(toolService.approve(toolId));
     }
 
@@ -125,7 +134,7 @@ public class ToolController {
             @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
             @ApiResponse(responseCode = "404", description = "Tool not found")
     })
-    public ResponseEntity<Void> delete(@PathVariable UUID toolId){
+    public ResponseEntity<Void> delete(@PathVariable UUID toolId) {
         toolService.delete(toolId);
         return ResponseEntity.noContent().build();
     }

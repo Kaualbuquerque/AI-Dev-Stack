@@ -69,6 +69,9 @@ public class Tool {
     @Column(name = "stack")
     private List<StackType> stacks = new ArrayList<>();
 
+    @Column(name = "upvotes_count", nullable = false)
+    private int upvotesCount = 0;
+
     // Relacionamentos
 
     @NotEmpty(message = "At least one tag is required")

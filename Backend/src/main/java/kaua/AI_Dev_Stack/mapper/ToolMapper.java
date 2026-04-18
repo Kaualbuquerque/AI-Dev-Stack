@@ -34,7 +34,7 @@ public class ToolMapper {
     }
 
     // Converte de Entidade para DTO de saída (Response)
-    public ToolResponseDTO toResponseDTO(Tool tool, int upvotesCount, boolean votedByMe) {
+    public ToolResponseDTO toResponseDTO(Tool tool, boolean votedByMe) {
         if (tool == null) return null;
 
         // Mapeia tags para TagResponseDTO
@@ -56,7 +56,7 @@ public class ToolMapper {
                 tool.isFeatured(),
                 tool.getCreatedAt(),
                 votedByMe,
-                upvotesCount,
+                tool.getUpvotesCount(),
                 tool.getUser().getEmail(),
                 tagDTOs
         );
