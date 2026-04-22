@@ -16,4 +16,5 @@ import java.util.UUID;
 @Repository
 public interface ToolRepository extends JpaRepository<Tool, UUID>,
         JpaSpecificationExecutor<Tool> {
+    Optional<Tool> findByNameIgnoreCase(String name);
 }

@@ -77,6 +77,21 @@ public class ToolController {
         return ResponseEntity.ok(toolService.findAllApproved(pageable, user, search, pricing, type, stack, tag, votedByMe));
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Find tool by name")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tool found successfully"),
+            @ApiResponse(responseCode = "404", description = "Tool not found with the provided name"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid name parameter"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ToolResponseDTO> findByName(
+            @RequestParam String name,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(toolService.findByName(name, user));
+    }
+
     @PostMapping("/{toolId}/upvote")
     @Operation(
             summary = "Toggle upvote",

@@ -39,26 +39,32 @@ public class ToolService {
 
     @Transactional
     public ToolResponseDTO save(ToolRequestDTO dto, User currentUser) {
-        // Busca as tags no banco pelos IDs
         List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
         if (tags.isEmpty()) {
             throw new ResourceNotFoundException("No tags found for the provided IDs.");
         }
 
-        // Valida o limite de 5 tags
         if (tags.size() > 5) {
             throw new RuntimeException("Maximum of 5 tags allowed.");
         }
 
-        // Monta a entidade com tags e usuário autenticado
         Tool tool = toolMapper.toEntity(dto, tags, currentUser);
 
-        // Salva
         Tool savedTool = toolRepository.save(tool);
 
-        // Retorna o DTO - votedByMe false e upvotesCount 0 para nova ferramenta
         return toolMapper.toResponseDTO(savedTool, false);
+    }
+
+    @Transactional(readOnly = true)
+    public ToolResponseDTO findByName(String name, User currentUser) {
+        Tool tool = toolRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool not found"));
+
+        boolean votedByMe = currentUser != null &&
+                upvoteRepository.existsByUserIdAndToolId(currentUser.getId(), tool.getId());
+
+        return toolMapper.toResponseDTO(tool, votedByMe);
     }
 
     @Transactional(readOnly = true)
