@@ -33,7 +33,7 @@ export default function SearchModal({ isOpen, setOpen }: SearchModalProps) {
     const handleSearch = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            window.location.href = createPageUrl('Home') + `?search=${encodeURIComponent(searchQuery)}`;
+            window.location.href = createPageUrl('/') + `?search=${encodeURIComponent(searchQuery)}`;
             setOpen(false);
         }
     };

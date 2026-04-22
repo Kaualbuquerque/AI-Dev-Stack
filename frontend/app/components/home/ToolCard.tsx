@@ -69,7 +69,7 @@ export default function ToolCard({ tool, onUpvote, userEmail, index = 0 }: ToolC
                 'transition-all duration-300',
                 'hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]'
             )}>
-                <Link href={createPageUrl('Tool-details') + `?name=${tool.name}`}>
+                <Link href={createPageUrl('tool-details') + `?name=${tool.name}`}>
 
                     {/* Featured Badge */}
                     {tool.featured && (

@@ -13,26 +13,28 @@ import { FiltersData } from "./types/filter";
 import { Tools, toolsService } from "./services/toolsService";
 import { useUser } from "./lib/UserContext";
 import { cn } from "./lib/utils";
+import { useSearchParams } from "next/navigation";
 
 
 export default function Home() {
 
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<FiltersData>({ pricing: [], stack: [], type: [] });
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState( searchParams.get('search') || '');
   const [currentPage, setCurrentPage] = useState(0);
   const [sortBy, setSortBy] = useState('upvotes');
-  const queryClient = useQueryClient();
   const { user, isLoading } = useUser();
   const PAGE_SIZE = 12;
 
   // Fetch tools
-  const { data: toolsPage, isLoading: isLoadingTools } = useQuery({
+  const { data: toolsPage, } = useQuery({
     queryKey: ["tools", currentPage, filters, searchQuery, sortBy, activeTag],
     queryFn: () => {
       return toolsService.getAll(currentPage, PAGE_SIZE, {
-        search: searchQuery || undefined,
+        search: searchQuery || '',
         pricing: filters.pricing[0] || undefined,
         type: filters.type[0] || undefined,
         stack: filters.stack.length > 0 ? filters.stack : undefined,
