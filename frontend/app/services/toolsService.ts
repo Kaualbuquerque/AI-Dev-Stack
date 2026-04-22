@@ -82,11 +82,12 @@ export const toolsService = {
         }
         return apiFetch<PaginatedResponse<Tools>>(`/tools?${params.toString()}`);
     },
-    getFilters: () => apiFetch<FiltersResponse>('/tools/filters'),
-    upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     suggest: (formData: SuggestToolForm) => apiFetch<Tools>('/tools', {
         method: 'POST',
         body: JSON.stringify(formData)
     }),
+    getFilters: () => apiFetch<FiltersResponse>('/tools/filters'),
+    upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     getVotedByMe: () => apiFetch<PaginatedResponse<Tools>>(`/tools?votedByMe=true&size=100`),
+    getByName: (name: string) => apiFetch<Tools>(`/tools/search?name=${encodeURIComponent(name)}`),
 }

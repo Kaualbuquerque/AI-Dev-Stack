@@ -13,20 +13,21 @@ export default function Community() {
 
     // Fetch tools
     const {
-        data: tools = [],
-    } = useQuery<Tools[]>({
-        queryKey: ['tools'],
-        queryFn: () => toolsService.getAll().then(res => res.content || []),
-        select: (data) => [...data].sort((a, b) => b.upvotesCount - a.upvotesCount),
+        data: toolsPage,
+    } = useQuery({
+        queryKey: ['tools', 'community'],
+        queryFn: () => toolsService.getAll(0, 100, { sort: 'upvotes' }),
     });
 
     // Get top tools
+    const tools = toolsPage?.content || [];
+    const totalElements = toolsPage?.totalElements || 0;
     const topTools = tools.slice(0, 10);
 
     // Get trending (most recently added with good upvotes)
     const trendingTools = [...tools]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .filter(tool => (tool.upvotesCount || 0) >= 5)
+        .filter(tool => (tool.upvotesCount || 0) >= 10)
         .slice(0, 5)
 
     // Stats
@@ -67,7 +68,7 @@ export default function Community() {
                     className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12'
                 >
                     {[
-                        { label: 'Total Tools', value: tools.length, icon: Sparkle, color: 'cyan' },
+                        { label: 'Total Tools', value: totalElements, icon: Sparkle, color: 'cyan' },
                         { label: 'Total Upvotes', value: totalUpvotes, icon: ArrowUp, color: 'purple' },
                     ].map((stat, i) => (
                         <div
@@ -108,7 +109,7 @@ export default function Community() {
                                 <h2 className='text-xl font-bold text-white'>Top 10 Tools</h2>
                             </div>
 
-                            <div className='space-y-3'>
+                            <div className='space-y-3 '>
                                 {topTools.map((tool, index) => (
                                     <Link key={tool.name} href={createPageUrl('Tool-details') + `?name=${tool.name}`}>
                                         <motion.div

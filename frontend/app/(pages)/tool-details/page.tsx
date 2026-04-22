@@ -30,10 +30,10 @@ export default function ToolDetails() {
     const {
         data: tool,
         isLoading: isLoadingTool,
-    } = useQuery<Tools[], Error, Tools | undefined>({
-        queryKey: ['tools'],
-        queryFn: () => toolsService.getAll().then(res => res.content || []),
-        select: (data) => data.find((tool) => tool.name === toolName),
+    } = useQuery<Tools>({
+        queryKey: ['tool', toolName],
+        queryFn: () => toolsService.getByName(toolName!),
+        enabled: !!toolName,
     });
 
     const handleUpvote = async () => {

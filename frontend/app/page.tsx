@@ -7,10 +7,10 @@ import { ArrowUpDown, Search, SlidersHorizontal } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/Select";
 import FilterSidebar from "./components/home/FilterSidebar";
 import ToolGrid from "./components/home/ToolGrid";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiltersData } from "./types/filter";
-import { Tools, toolsService } from "./services/toolsService";
+import { toolsService } from "./services/toolsService";
 import { useUser } from "./lib/UserContext";
 import { cn } from "./lib/utils";
 import { useSearchParams } from "next/navigation";
@@ -23,7 +23,7 @@ export default function Home() {
   const [filters, setFilters] = useState<FiltersData>({ pricing: [], stack: [], type: [] });
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState( searchParams.get('search') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [currentPage, setCurrentPage] = useState(0);
   const [sortBy, setSortBy] = useState('upvotes');
   const { user, isLoading } = useUser();
@@ -96,7 +96,7 @@ export default function Home() {
             </Button>
 
             <span className="text-slate-400 text-sm">
-              Displaying <span className="text-white font-medium">{tools.length}</span> AI tools
+              Displaying <span className="text-white font-medium">{toolsPage?.totalElements || 0}</span> AI tools
             </span>
           </div>
 
