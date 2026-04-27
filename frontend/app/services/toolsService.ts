@@ -29,6 +29,8 @@ export interface SuggestToolForm {
     thumbnailUrl: string;
     pricingModel: PricingType;
     toolType: ToolType;
+    tagIds: string[];
+    stacks: string[];
 }
 
 export interface Tools {
@@ -52,6 +54,13 @@ export interface Tools {
     votedByMe: boolean;
     userEmail: string;
     createdAt: string; // Datas no JSON costumam vir como string (ISO 8601)
+}
+
+export interface tag {
+    id: string,
+    name: string,
+    slug: string,
+    iconKey: string
 }
 
 export const toolsService = {
@@ -90,4 +99,5 @@ export const toolsService = {
     upvote: (toolId: number) => apiFetch<Tools>(`/tools/${toolId}/upvote`, { method: 'POST' }),
     getVotedByMe: () => apiFetch<PaginatedResponse<Tools>>(`/tools?votedByMe=true&size=100`),
     getByName: (name: string) => apiFetch<Tools>(`/tools/search?name=${encodeURIComponent(name)}`),
+    getTags: () => apiFetch<tag[]>('/tags'),
 }

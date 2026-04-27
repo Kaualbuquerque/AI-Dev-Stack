@@ -12,9 +12,9 @@ import { SuggestToolForm, toolsService } from "@/app/services/toolsService";
 import { PricingType } from "@/app/types/princing";
 import { ToolType } from "@/app/types/tool";
 import { createPageUrl } from "@/app/utils";
-import { useMutation} from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, DollarSign, FileText, Globe, ImageIcon, Layers, Lightbulb, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, DollarSign, FileText, Globe, ImageIcon, Layers, Lightbulb, Send, Sparkles, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -33,11 +33,19 @@ export default function SuggestTool() {
         thumbnailUrl: '',
         pricingModel: '' as PricingType,
         toolType: '' as ToolType,
+        tagIds: [],
+        stacks: [],
     });
+
+    const { data: availableTags, isLoading: tagsLoading } = useQuery({
+        queryKey: ['tags'],
+        queryFn: () => toolsService.getTags(),
+    })
 
 
     const { mutateAsync: submitTool, isPending: isSubmitting } = useMutation({
         mutationFn: (formData: SuggestToolForm) => {
+            console.log('Sending:', JSON.stringify(formData));
             return toolsService.suggest(formData);
         },
         onSuccess: (response) => {
@@ -45,7 +53,7 @@ export default function SuggestTool() {
             toast.success("Tool submitted successfully!");
         },
         onError: (error) => {
-            toast.error("Failed to submit. Please try again later.");
+            toast.error(error.message || "Failed to submit. Please try again later.");
         }
     });
 
@@ -213,6 +221,107 @@ export default function SuggestTool() {
                                     </div>
                                 </div>
 
+                                {/* Stacks */}
+                                <div className="space-y-2">
+                                    <Label className="text-white flex items-center gap-2">
+                                        <Layers className="w-4 h-4 text-cyan-400" />
+                                        Tech Stack * <span className="text-slate-500 text-xs">(max 5)</span>
+                                    </Label>
+
+                                    {/* Selected stacks */}
+                                    {formData.stacks.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {formData.stacks.map((stack) => (
+                                                <span
+                                                    key={stack}
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm"
+                                                >
+                                                    {stack === 'CSHARP' ? 'C#' : stack.charAt(0) + stack.slice(1).toLowerCase()}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setFormData({
+                                                            ...formData,
+                                                            stacks: formData.stacks.filter(s => s !== stack)
+                                                        })}
+                                                        className="hover:text-white transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Stack selector */}
+                                    <Select
+                                        onValueChange={(value) => {
+                                            if (formData.stacks.includes(value)) return;
+                                            if (formData.stacks.length >= 5) {
+                                                toast.error("Maximum of 5 stacks allowed.");
+                                                return;
+                                            }
+                                            setFormData({ ...formData, stacks: [...formData.stacks, value] });
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                                            <SelectValue placeholder="Select a tech stack..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800 border-slate-700">
+                                            {["JAVA", "JAVASCRIPT", "TYPESCRIPT", "PYTHON", "GO", "RUST", "CSHARP", "RUBY", "PHP", "SWIFT"].map((stack) => (
+                                                <SelectItem
+                                                    key={stack}
+                                                    value={stack}
+                                                    disabled={formData.stacks.includes(stack)}
+                                                    className="text-white hover:bg-slate-700 disabled:opacity-40"
+                                                >
+                                                    {stack === 'CSHARP' ? 'C#' : stack.charAt(0) + stack.slice(1).toLowerCase()}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Tags */}
+                                <div className="space-y-2">
+                                    <Label className="text-white flex items-center gap-2">
+                                        <Tag className="w-4 h-4 text-cyan-400" />
+                                        Tags * <span className="text-slate-500 text-xs">(max 5)</span>
+                                    </Label>
+                                    {tagsLoading ? (
+                                        <div className="text-slate-500 text-sm">Loading tags...</div>
+                                    ) : (
+                                        <div className="flex flex-wrap gap-2">
+                                            {availableTags?.map((tag) => (
+                                                <button
+                                                    key={tag.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const isSelected = formData.tagIds.includes(tag.id);
+                                                        if (!isSelected && formData.tagIds.length >= 5) {
+                                                            toast.error("Maximum of 5 tags allowed.");
+                                                            return
+                                                        }
+                                                        setFormData({
+                                                            ...formData,
+                                                            tagIds: isSelected
+                                                                ? formData.tagIds.filter(id => id !== tag.id)
+                                                                : [...formData.tagIds, tag.id]
+                                                        });
+                                                    }}
+                                                    className={cn(
+                                                        "px-3 py-1.5 rounded-full border text-sm font-medium transition-all capitalize",
+                                                        formData.tagIds.includes(tag.id)
+                                                            ? "border-purple-500 bg-purple-500/20 text-purple-400"
+                                                            : "border-slate-700 bg-slate-900/50 text-slate-400 hover:border-slate-500"
+                                                    )}
+                                                >
+                                                    #{tag.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
                                 {/* Description */}
                                 <div className="space-y-2">
                                     <Label htmlFor="description" className="text-white flex items-center gap-2">
@@ -243,7 +352,7 @@ export default function SuggestTool() {
                                         </motion.div>
                                     ) : (
                                         <>
-                                            <Send className="w-5 h-5 mr2" />
+                                            <Send className="w-5 h-5 mr-2" />
                                             Submit Suggestion
                                         </>
                                     )}
