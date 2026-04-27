@@ -40,7 +40,7 @@ public class ToolMapper {
         // Mapeia tags para TagResponseDTO
         List<TagResponseDTO> tagDTOs = tool.getTags() != null
                 ? tool.getTags().stream()
-                .map(tag -> new TagResponseDTO(tag.getName(), tag.getSlug(), tag.getIconKey()))
+                .map(tag -> new TagResponseDTO(tag.getId(), tag.getName(), tag.getSlug(), tag.getIconKey()))
                 .toList()
                 : List.of();
 

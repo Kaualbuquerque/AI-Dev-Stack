@@ -60,7 +60,7 @@ public class GlobalExceptionHandler{
 
     // 500 - qualquer outro erro não tratado
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception ex){
+    public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new ErrorResponseDTO(
                         LocalDateTime.now(),

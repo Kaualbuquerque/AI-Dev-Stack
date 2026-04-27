@@ -22,6 +22,7 @@ public class TagMapper {
         if (tag == null) return null;
 
         return new TagResponseDTO(
+                tag.getId(),
                 tag.getName(),
                 tag.getSlug(),
                 tag.getIconKey()

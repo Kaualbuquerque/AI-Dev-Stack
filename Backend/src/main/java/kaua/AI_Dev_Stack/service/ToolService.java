@@ -2,6 +2,7 @@ package kaua.AI_Dev_Stack.service;
 
 import kaua.AI_Dev_Stack.dto.request.ToolRequestDTO;
 import kaua.AI_Dev_Stack.dto.response.ToolResponseDTO;
+import kaua.AI_Dev_Stack.exceptions.DuplicateResourceException;
 import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.mapper.ToolMapper;
 import kaua.AI_Dev_Stack.model.Tag;
@@ -39,21 +40,30 @@ public class ToolService {
 
     @Transactional
     public ToolResponseDTO save(ToolRequestDTO dto, User currentUser) {
-        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
+        try {
+            List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
-        if (tags.isEmpty()) {
-            throw new ResourceNotFoundException("No tags found for the provided IDs.");
+            if (toolRepository.existsByUrl(dto.url())){
+                throw new DuplicateResourceException("A tool with this URL is already registered.");
+            }
+
+            if (tags.isEmpty()) {
+                throw new ResourceNotFoundException("No tags found for the provided IDs.");
+            }
+
+            if (tags.size() > 5) {
+                throw new RuntimeException("Maximum of 5 tags allowed.");
+            }
+
+            Tool tool = toolMapper.toEntity(dto, tags, currentUser);
+            Tool savedTool = toolRepository.save(tool);
+            return toolMapper.toResponseDTO(savedTool, false);
+
+        } catch (Exception e) {
+            // ✅ Loga o erro completo
+            e.printStackTrace();
+            throw e;
         }
-
-        if (tags.size() > 5) {
-            throw new RuntimeException("Maximum of 5 tags allowed.");
-        }
-
-        Tool tool = toolMapper.toEntity(dto, tags, currentUser);
-
-        Tool savedTool = toolRepository.save(tool);
-
-        return toolMapper.toResponseDTO(savedTool, false);
     }
 
     @Transactional(readOnly = true)
