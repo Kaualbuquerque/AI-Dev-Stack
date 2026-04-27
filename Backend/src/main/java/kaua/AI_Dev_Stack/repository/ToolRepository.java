@@ -21,4 +21,7 @@ public interface ToolRepository extends JpaRepository<Tool, UUID>,
     Optional<Tool> findByNameIgnoreCase(String name);
 
     boolean existsByUrl(String url);
+
+    @Query("SELECT t FROM Tool t WHERE t.isApproved = false")
+    Page<Tool> findAllPending(Pageable pageable);
 }

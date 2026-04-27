@@ -40,30 +40,24 @@ public class ToolService {
 
     @Transactional
     public ToolResponseDTO save(ToolRequestDTO dto, User currentUser) {
-        try {
-            List<Tag> tags = tagRepository.findAllById(dto.tagIds());
+        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
-            if (toolRepository.existsByUrl(dto.url())){
-                throw new DuplicateResourceException("A tool with this URL is already registered.");
-            }
-
-            if (tags.isEmpty()) {
-                throw new ResourceNotFoundException("No tags found for the provided IDs.");
-            }
-
-            if (tags.size() > 5) {
-                throw new RuntimeException("Maximum of 5 tags allowed.");
-            }
-
-            Tool tool = toolMapper.toEntity(dto, tags, currentUser);
-            Tool savedTool = toolRepository.save(tool);
-            return toolMapper.toResponseDTO(savedTool, false);
-
-        } catch (Exception e) {
-            // ✅ Loga o erro completo
-            e.printStackTrace();
-            throw e;
+        if (toolRepository.existsByUrl(dto.url())) {
+            throw new DuplicateResourceException("A tool with this URL is already registered.");
         }
+
+        if (tags.isEmpty()) {
+            throw new ResourceNotFoundException("No tags found for the provided IDs.");
+        }
+
+        if (tags.size() > 5) {
+            throw new RuntimeException("Maximum of 5 tags allowed.");
+        }
+
+        Tool tool = toolMapper.toEntity(dto, tags, currentUser);
+        Tool savedTool = toolRepository.save(tool);
+        return toolMapper.toResponseDTO(savedTool, false);
+
     }
 
     @Transactional(readOnly = true)
@@ -101,12 +95,37 @@ public class ToolService {
         ));
     }
 
+    @Transactional(readOnly = true)
+    public Page<ToolResponseDTO> findAllPending(Pageable pageable, User currentUser) {
+        Page<Tool> tools = toolRepository.findAllPending(pageable);
+
+        Set<UUID> votedToolIds = currentUser != null
+                ? upvoteRepository.findToolIdsByUserId(currentUser.getId())
+                : Set.of();
+
+        return tools.map(tool -> toolMapper.toResponseDTO(
+                tool,
+                votedToolIds.contains(tool.getId())
+        ));
+    }
+
     @Transactional
     public ToolResponseDTO approve(UUID toolId) {
         Tool tool = toolRepository.findById(toolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
 
         tool.setApproved(true);
+        Tool savedTool = toolRepository.save(tool);
+
+        return toolMapper.toResponseDTO(savedTool, false);
+    }
+
+    @Transactional
+    public ToolResponseDTO featured(UUID toolId){
+        Tool tool = toolRepository.findById(toolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
+
+        tool.setFeatured(!tool.isFeatured());
         Tool savedTool = toolRepository.save(tool);
 
         return toolMapper.toResponseDTO(savedTool, false);

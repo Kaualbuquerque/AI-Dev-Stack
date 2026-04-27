@@ -138,6 +138,36 @@ public class ToolController {
         return ResponseEntity.ok(toolService.approve(toolId));
     }
 
+    @GetMapping("/pending")
+    @Operation(
+            summary = "List pending tools",
+            description = "Returns all tools awaiting approval — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pending tools retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role")
+    })
+    public ResponseEntity<Page<ToolResponseDTO>> findAllPending(
+            Pageable pageable, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(toolService.findAllPending(pageable, user));
+    }
+
+    @PatchMapping("/{toolId}/feature")
+    @Operation(
+            summary = "Toggle feature tool",
+            description = "Highlights or removes highlight from a tool — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tool feature status updated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tool not found")
+    })
+    public ResponseEntity<ToolResponseDTO> featured(@PathVariable UUID toolId) {
+        return ResponseEntity.ok(toolService.featured(toolId));
+    }
+
     @DeleteMapping("/{toolId}")
     @Operation(
             summary = "Delete tool",

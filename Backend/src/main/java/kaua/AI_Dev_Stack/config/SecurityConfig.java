@@ -53,10 +53,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers("/sign-in", "/sign-up").permitAll()
                         // Rotas admin
-                        .requestMatchers(HttpMethod.DELETE, "/tools/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/tools/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/tools/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/tags/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/tools/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/tags/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/tags/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 ).authenticationProvider(authenticationProvider())
