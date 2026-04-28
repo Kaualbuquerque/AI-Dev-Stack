@@ -1,13 +1,11 @@
 'use client'
 
-import { Brain, Search, Sparkles, Menu, X, Compass, Users } from 'lucide-react';
+import { Brain, Search, Sparkles, Menu, X, Compass, Users, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './Button';
 import { createPageUrl } from '@/app/utils';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { userService } from '@/app/services/userService';
 import { useUser } from '@/app/lib/UserContext';
 
 interface HeaderProps {
@@ -19,6 +17,8 @@ export default function Header({ onOpenSearch }: HeaderProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user } = useUser();
     const router = useRouter();
+
+    console.log(user)
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 glass-effect">
@@ -83,6 +83,15 @@ export default function Header({ onOpenSearch }: HeaderProps) {
                             >
                                 Sign In
                             </Button>
+                        )}
+
+                        {user?.role === 'ADMIN' && (
+                            <Link href="/admin">
+                                <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-slate-800">
+                                    <Shield className="w-4 h-4 mr-2" />
+                                    Admin
+                                </Button>
+                            </Link>
                         )}
                     </nav>
 

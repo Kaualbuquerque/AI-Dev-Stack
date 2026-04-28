@@ -1,0 +1,235 @@
+"use client"
+
+import { motion } from "framer-motion";
+import { useRequireAuth } from "@/app/hooks/useRequireAuth"
+import { useUser } from "@/app/lib/UserContext";
+import { toolsService } from "@/app/services/toolsService";
+import { PricingType, pricingConfig } from "@/app/types/princing";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, ExternalLink, Shield, Star, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "@/app/components/ui/Badge";
+import { cn } from "@/app/lib/utils";
+import { Button } from "@/app/components/ui/Button";
+
+export default function Admin() {
+
+    useRequireAuth();
+    const router = useRouter();
+    const queryClient = useQueryClient();
+    const { user, isLoading } = useUser();
+    const [currentPage, setCurrentPage] = useState(0);
+    const [loadingAction, setLoadingAction] = useState<string | null>(null);
+
+    const { data: toolsPage, isLoading: isLoadingTools } = useQuery({
+        queryKey: ['tools', 'pending', currentPage],
+        queryFn: () => toolsService.getPeding(currentPage, 12),
+    });
+
+    useEffect(() => {
+        if (!isLoading && user && user.role !== 'ADMIN') {
+            router.push('/');
+        }
+    }, [user, isLoading]);
+
+    if (!user && !isLoading) return null;
+    if (!isLoading && user?.role !== 'ADMIN') return null;
+
+    const tools = toolsPage?.content || [];
+    const totalPages = toolsPage?.totalPages || 0;
+    const totalElements = toolsPage?.totalElements || 0;
+
+    const handleAction = async (toolId: number, action: 'approve' | 'feature' | 'delete') => {
+        setLoadingAction(`${action}-${toolId}`)
+        try {
+            switch (action) {
+                case 'approve':
+                    await toolsService.approve(toolId);
+                    toast.success('Tool approved successfully!');
+                    break;
+                case 'feature':
+                    await toolsService.feature(toolId);
+                    toast.success('Tool featured status updated!');
+                    break;
+                case 'delete':
+                    await toolsService.deleteTool(toolId);
+                    toast.success('Tool rejected and deleted!');
+                    break;
+            }
+            queryClient.invalidateQueries({ queryKey: ['tools', 'pending'] });
+        } catch (error) {
+            toast.error('Action failed. Please try again.')
+        } finally {
+            setLoadingAction(null);
+        }
+    };
+
+    const normalizedPricing = (pricingModel: string) =>
+        (pricingModel.charAt(0).toUpperCase() + pricingModel.slice(1).toLocaleLowerCase()) as PricingType;
+
+    return (
+        <div className="min-h-screen py-12">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-10"
+                >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4">
+                        <Shield className="w-4 h-4 text-purple-400" />
+                        <span className="text-sm text-purple-300">Admin Panel</span>
+                    </div>
+                    <h1 className="text-3xl font-bold text-white mb-2">Pending Tools</h1>
+                    <p className="text-slate-400">
+                        {totalElements} tool{totalElements !== 1 ? 's' : ''} awaiting approval
+                    </p>
+                </motion.div>
+
+                {/* Tools List */}
+                {isLoadingTools ? (
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="h-32 bg-slate-800/30 rounded-2xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : tools.length === 0 ? (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-20"
+                    >
+                        <Check className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+                        <h2 className="text-xl font-bold text-white mb-2">All caught up!</h2>
+                        <p className="text-slate-400">No tools pending approval.</p>
+                    </motion.div>
+                ) : (
+                    <div className="space-y-4">
+                        {tools.map((tool, index) => {
+                            const pricing = pricingConfig[normalizedPricing(tool.pricingModel)] || pricingConfig['Free'];
+                            return (
+                                <motion.div
+                                    key={tool.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6"
+                                >
+                                    <div className="flex flex-col sm:flex-row gap-4">
+
+                                        {/* Thumbnail */}
+                                        <div className="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center overflow-hidden shrink-0">
+                                            {tool.thumbnailUrl ? (
+                                                <img src={tool.thumbnailUrl} alt={tool.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-2xl">🤖</span>
+                                            )}
+                                        </div>
+
+                                        {/* Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <h3 className="font-bold text-white text-lg">{tool.name}</h3>
+                                                <Badge variant="outline" className={cn("text-xs", pricing.className)}>
+                                                    {pricing.icon} {pricing.label}
+                                                </Badge>
+                                                <Badge variant="outline" className="text-xs border-slate-600 text-slate-400 capitalize">
+                                                    {tool.toolType}
+                                                </Badge>
+                                            </div>
+                                            <p className="text-slate-400 text-sm mb-2 line-clamp-2">{tool.description}</p>
+                                            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                                <span>By <span className="text-slate-300">{tool.userEmail}</span></span>
+                                                <span>Added {new Date(tool.createdAt).toLocaleDateString()}</span>
+                                                {tool.tags?.map(tag => (
+                                                    <span key={tag.slug} className="px-2 py-0.5 bg-slate-700/50 rounded-md text-slate-400">
+                                                        #{tag.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex sm:flex-col gap-2 shrink-0">
+                                            <a
+                                                href={tool.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="p-2 rounded-lg text-slate-400 hover:bg-slate-700 transition-colors"
+                                            >
+                                                <ExternalLink className="w-4 h-4" />
+                                            </a>
+
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleAction(tool.id, 'approve')}
+                                                disabled={loadingAction === `approve-${tool.id}`}
+                                                className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30"
+                                            >
+                                                <Check className="w-4 h-4 mr-1" />
+                                                Approve
+                                            </Button>
+
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleAction(tool.id, 'feature')}
+                                                disabled={loadingAction === `feature-${tool.id}`}
+                                                className={cn(
+                                                    "border",
+                                                    tool.featured
+                                                        ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                                                        : "bg-slate-700/50 text-slate-400 border-slate-600 hover:bg-slate-700"
+                                                )}
+                                            >
+                                                <Star className="w-4 h-4 mr-1" />
+                                                {tool.featured ? 'Unfeature' : 'Feature'}
+                                            </Button>
+
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleAction(tool.id, 'delete')}
+                                                disabled={loadingAction === `delete-${tool.id}`}
+                                                className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30"
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-1" />
+                                                Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-10">
+                        <Button
+                            variant="outline"
+                            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                            disabled={currentPage === 0}
+                            className="border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+                        >
+                            Previous
+                        </Button>
+                        <span className="text-slate-400 text-sm">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                            disabled={currentPage === totalPages - 1}
+                            className="border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                )}
+            </div>
+        </div >
+    );
+}
