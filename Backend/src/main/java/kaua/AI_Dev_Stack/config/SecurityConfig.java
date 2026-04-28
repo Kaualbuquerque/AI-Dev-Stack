@@ -49,16 +49,19 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/tools/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
-                        .requestMatchers("/sign-in", "/sign-up").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tools/filters").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tools/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tools").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tags/**").permitAll()
+
                         // Rotas admin
-                        .requestMatchers(HttpMethod.GET, "/tools/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/tools/pending").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/tools/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/tools/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/tags/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/tags/**").hasRole("ADMIN")
 
+                        // Qualquer outra rota requer autenticação
                         .anyRequest().authenticated()
                 ).authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -87,7 +90,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-type", "Accept"));
         configuration.setAllowCredentials(true);
 

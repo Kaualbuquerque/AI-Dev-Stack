@@ -31,6 +31,11 @@ public record UserResponseDTO(
         @Schema(
                 description = "A set of Resource IDs that this user has upvoted.",
                 example = "[\"724cf048-9f33-4f90-8910-449e7b23c72b\", \"550e8400-e29b-41d4-a716-446655440000\"]")
-        Set<UUID> upvotedResourceIds
-) {
+        Set<UUID> upvotedResourceIds,
+
+        @Schema(
+                description = "The access level of the user. Defines permissions and UI visibility."
+        )
+        String role
+        ) {
 }

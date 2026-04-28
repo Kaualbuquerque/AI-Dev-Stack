@@ -39,8 +39,8 @@ public class UserMapper {
                 user.getEmail(),
                 user.getUsername(),
                 user.getCreatedAt(),
-                upvotedResourceIds
-
+                upvotedResourceIds,
+                user.getRole().name()
         );
     }
 }
