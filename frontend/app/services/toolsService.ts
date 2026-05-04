@@ -43,6 +43,7 @@ export interface Tools {
     toolType: ToolType; // Novo campo integrado
     stacks: string[];
     tags: {
+        id: string;
         name: string;
         slug: string;
         iconKey: string;
@@ -113,7 +114,7 @@ export const toolsService = {
     getTags: () =>
         apiFetch<tag[]>('/tags'),
 
-    getPeding: (page = 0, size = 12) =>
+    getPending: (page = 0, size = 12) =>
         apiFetch<PaginatedResponse<Tools>>(`/tools/pending?page=${page}&size=${size}`),
 
     approve: (toolId: number) =>
@@ -121,6 +122,12 @@ export const toolsService = {
 
     feature: (toolId: number) =>
         apiFetch<Tools>(`/tools/${toolId}/feature`, { method: 'PATCH' }),
+
+    update: (toolId: number, data: any) =>
+        apiFetch<Tools>(`/tools/${toolId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        }),
 
     deleteTool: (toolId: number) =>
         apiFetch<void>(`/tools/${toolId}`, { method: 'DELETE' }),
