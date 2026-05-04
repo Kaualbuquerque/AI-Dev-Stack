@@ -56,6 +56,7 @@ public class ToolMapper {
                 tool.isFeatured(),
                 tool.getCreatedAt(),
                 votedByMe,
+                tool.isApproved(),
                 tool.getUpvotesCount(),
                 tool.getUser().getEmail(),
                 tagDTOs

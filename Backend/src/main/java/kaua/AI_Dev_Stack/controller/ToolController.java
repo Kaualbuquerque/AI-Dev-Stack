@@ -12,6 +12,7 @@ import kaua.AI_Dev_Stack.exceptions.ResourceNotFoundException;
 import kaua.AI_Dev_Stack.model.Enums.PricingType;
 import kaua.AI_Dev_Stack.model.Enums.StackType;
 import kaua.AI_Dev_Stack.model.Enums.ToolType;
+import kaua.AI_Dev_Stack.model.Tool;
 import kaua.AI_Dev_Stack.model.User;
 import kaua.AI_Dev_Stack.service.ToolService;
 import kaua.AI_Dev_Stack.service.UpvoteService;
@@ -166,6 +167,25 @@ public class ToolController {
     })
     public ResponseEntity<ToolResponseDTO> featured(@PathVariable UUID toolId) {
         return ResponseEntity.ok(toolService.featured(toolId));
+    }
+
+    @PutMapping("/{toolId}")
+    @Operation(
+            summary = "Update tool",
+            description = "Updates an existing tool — requires ADMIN role"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tool updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden — requires ADMIN role"),
+            @ApiResponse(responseCode = "404", description = "Tool not found")
+    })
+    public ResponseEntity<ToolResponseDTO> update(
+            @PathVariable UUID toolId,
+            @Valid @RequestBody ToolRequestDTO body
+    ) {
+        return ResponseEntity.ok(toolService.update(toolId, body));
     }
 
     @DeleteMapping("/{toolId}")

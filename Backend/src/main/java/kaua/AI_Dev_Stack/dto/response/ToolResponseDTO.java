@@ -45,6 +45,9 @@ public record ToolResponseDTO(
         @Schema(description = "Indicates if the authenticated user upvoted this.", example = "false")
         boolean votedByMe,
 
+        @Schema(description = "Indicates if the tool has been approved.", example = "true")
+        boolean isApproved,
+
         @Schema(description = "Total number of upvotes.", example = "42")
         int upvotesCount,
 

@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -121,7 +122,7 @@ public class ToolService {
     }
 
     @Transactional
-    public ToolResponseDTO featured(UUID toolId){
+    public ToolResponseDTO featured(UUID toolId) {
         Tool tool = toolRepository.findById(toolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
 
@@ -129,6 +130,30 @@ public class ToolService {
         Tool savedTool = toolRepository.save(tool);
 
         return toolMapper.toResponseDTO(savedTool, false);
+    }
+
+    @Transactional
+    public ToolResponseDTO update(UUID toolId, ToolRequestDTO dto) {
+        Tool tool = toolRepository.findById(toolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool not found."));
+
+        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
+        if (tags.isEmpty()) {
+            throw new ResourceNotFoundException("No tags found for the provided IDs.");
+        }
+
+        tool.setName(dto.name().trim());
+        tool.setDescription(dto.description());
+        tool.setUrl(dto.url());
+        tool.setThumbnailUrl(dto.thumbnailUrl());
+        tool.setPricingModel(dto.pricingModel());
+        tool.setToolType(dto.toolType());
+        tool.setStacks(new ArrayList<>(dto.stacks()));
+        tool.setTags(new ArrayList<>(tags));
+
+        Tool savedTool = toolRepository.save(tool);
+        return toolMapper.toResponseDTO(savedTool, false);
+
     }
 
     @Transactional
