@@ -45,7 +45,6 @@ export default function SuggestTool() {
 
     const { mutateAsync: submitTool, isPending: isSubmitting } = useMutation({
         mutationFn: (formData: SuggestToolForm) => {
-            console.log('Sending:', JSON.stringify(formData));
             return toolsService.suggest(formData);
         },
         onSuccess: (response) => {
@@ -76,6 +75,73 @@ export default function SuggestTool() {
 
         await submitTool({ ...formData, thumbnailUrl });
     };
+
+    if (submitted) {
+        return (
+            <div className="min-h-screen flex items-center justify-center px-4">
+                {/* Background glow */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative text-center max-w-md"
+                >
+                    <div className="absolute -inset-4 bg-linear-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 rounded-3xl blur-2xl" />
+
+                    <div className="relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-10">
+                        {/* Icon */}
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+                            className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-purple-500 flex items-center justify-center mx-auto mb-6"
+                        >
+                            <Sparkles className="w-10 h-10 text-white" />
+                        </motion.div>
+
+                        <h2 className="text-2xl font-bold text-white mb-3">
+                            Suggestion Submitted!
+                        </h2>
+                        <p className="text-slate-400 mb-8">
+                            Thank you for contributing to the community! Your tool suggestion is now pending review by our admins.
+                        </p>
+
+                        {/* Actions */}
+                        <div className="flex flex-col gap-3">
+                            <Button
+                                onClick={() => {
+                                    setSubmitted(false);
+                                    setFormData({
+                                        name: '',
+                                        description: '',
+                                        url: '',
+                                        thumbnailUrl: '',
+                                        pricingModel: '' as PricingType,
+                                        toolType: '' as ToolType,
+                                        tagIds: [],
+                                        stacks: [],
+                                    });
+                                }}
+                                className="w-full bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white"
+                            >
+                                <Send className="w-4 h-4 mr-2" />
+                                Suggest Another Tool
+                            </Button>
+                            <Link href={createPageUrl("/")}>
+                                <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800">
+                                    Back to Directory
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen py-8">
