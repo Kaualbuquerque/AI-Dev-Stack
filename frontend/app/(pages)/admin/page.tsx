@@ -56,11 +56,16 @@ export default function Admin() {
         enabled: activeTab === 'approved',
     });
 
+    const { data: availableTags, isLoading: tagsLoading } = useQuery({
+        queryKey: ['tags'],
+        queryFn: () => toolsService.getTags(),
+    });
+
     const toolsPage = activeTab === 'pending' ? pendingPage : approvedPage;
     const isLoadingTools = activeTab === 'pending' ? isLoadingPending : isLoadingApproved;
     const tools = toolsPage?.content || [];
-    const totalPages = toolsPage?.totalPages || 0;
-    const totalElements = toolsPage?.totalElements || 0;
+    const totalPages = toolsPage?.page?.totalPages || 0;
+    const totalElements = toolsPage?.page?.totalElements || 0;
 
     const handleTabChange = (tab: Tab) => {
         setActiveTab(tab);
@@ -265,9 +270,9 @@ export default function Admin() {
                         )}
                     >
                         Pending
-                        {pendingPage?.totalElements ? (
+                        {pendingPage?.page.totalElements ? (
                             <span className="ml-2 px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded-full">
-                                {pendingPage.totalElements}
+                                {pendingPage.page.totalElements}
                             </span>
                         ) : null}
                     </button>
@@ -348,6 +353,8 @@ export default function Admin() {
                                 </DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 mt-4">
+
+                                {/* Name */}
                                 <div className="space-y-2">
                                     <Label className="text-white">Name</Label>
                                     <Input
@@ -356,6 +363,8 @@ export default function Admin() {
                                         className="bg-slate-800 border-slate-700 text-white"
                                     />
                                 </div>
+
+                                {/* Description */}
                                 <div className="space-y-2">
                                     <Label className="text-white">Description</Label>
                                     <Textarea
@@ -364,6 +373,8 @@ export default function Admin() {
                                         className="bg-slate-800 border-slate-700 text-white"
                                     />
                                 </div>
+
+                                {/* URL */}
                                 <div className="space-y-2">
                                     <Label className="text-white">URL</Label>
                                     <Input
@@ -372,6 +383,8 @@ export default function Admin() {
                                         className="bg-slate-800 border-slate-700 text-white"
                                     />
                                 </div>
+
+                                {/* Pricing Model */}
                                 <div className="space-y-2">
                                     <Label className="text-white">Pricing Model</Label>
                                     <Select
@@ -388,6 +401,8 @@ export default function Admin() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+
+                                {/* Tool Type */}
                                 <div className="space-y-2">
                                     <Label className="text-white">Tool Type</Label>
                                     <Select
@@ -404,6 +419,100 @@ export default function Admin() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+
+                                {/* Stacks */}
+                                <div className="space-y-2">
+                                    <Label className="text-white">Tech Stacks</Label>
+                                    {editingTool.stacks.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {editingTool.stacks.map((stack) => (
+                                                <span
+                                                    key={stack}
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm"
+                                                >
+                                                    {stack === 'CSHARP' ? 'C#' : stack.charAt(0) + stack.slice(1).toLowerCase()}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEditingTool({
+                                                            ...editingTool,
+                                                            stacks: editingTool.stacks.filter(s => s !== stack)
+                                                        })}
+                                                        className="hover:text-white transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <Select
+                                        onValueChange={(value) => {
+                                            if (editingTool.stacks.includes(value)) return;
+                                            if (editingTool.stacks.length >= 5) {
+                                                toast.error("Maximum of 5 stacks allowed.");
+                                                return;
+                                            }
+                                            setEditingTool({ ...editingTool, stacks: [...editingTool.stacks, value] });
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                                            <SelectValue placeholder="Add a tech stack..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-800 border-slate-700">
+                                            {["JAVA", "JAVASCRIPT", "TYPESCRIPT", "PYTHON", "GO", "RUST", "CSHARP", "RUBY", "PHP", "SWIFT"].map((stack) => (
+                                                <SelectItem
+                                                    key={stack}
+                                                    value={stack}
+                                                    disabled={editingTool.stacks.includes(stack)}
+                                                    className="text-white hover:bg-slate-700 disabled:opacity-40"
+                                                >
+                                                    {stack === 'CSHARP' ? 'C#' : stack.charAt(0) + stack.slice(1).toLowerCase()}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Tags */}
+                                <div className="space-y-2">
+                                    <Label className="text-white">Tags <span className="text-slate-500 text-xs">(max 5)</span></Label>
+                                    {tagsLoading ? (
+                                        <div className="text-slate-500 text-sm">Loading tags...</div>
+                                    ) : (
+                                        <div className="flex flex-wrap gap-2">
+                                            {availableTags?.map((tag) => {
+                                                const isSelected = editingTool.tags.some(t => t.id === tag.id);
+                                                return (
+                                                    <button
+                                                        key={tag.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (!isSelected && editingTool.tags.length >= 5) {
+                                                                toast.error("Maximum of 5 tags allowed.");
+                                                                return;
+                                                            }
+                                                            setEditingTool({
+                                                                ...editingTool,
+                                                                tags: isSelected
+                                                                    ? editingTool.tags.filter(t => t.id !== tag.id)
+                                                                    : [...editingTool.tags, tag]
+                                                            });
+                                                        }}
+                                                        className={cn(
+                                                            "px-3 py-1.5 rounded-full border text-sm font-medium transition-all capitalize",
+                                                            isSelected
+                                                                ? "border-purple-500 bg-purple-500/20 text-purple-400"
+                                                                : "border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-500"
+                                                        )}
+                                                    >
+                                                        #{tag.name}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="flex gap-3 pt-4">
                                     <Button
                                         onClick={handleEdit}

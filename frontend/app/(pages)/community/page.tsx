@@ -21,7 +21,7 @@ export default function Community() {
 
     // Get top tools
     const tools = toolsPage?.content || [];
-    const totalElements = toolsPage?.totalElements || 0;
+    const totalElements = toolsPage?.page.totalElements || 0;
     const topTools = tools.slice(0, 10);
 
     // Get trending (most recently added with good upvotes)

@@ -40,11 +40,11 @@ export default function Home() {
         stack: filters.stack.length > 0 ? filters.stack : undefined,
         sort: sortBy || undefined,
         tag: activeTag || undefined,
-      });
+      })
     },
   });
 
-  const totalPages = toolsPage?.totalPages || 0;
+  const totalPages = toolsPage?.page?.totalPages || 0;
   const tools = toolsPage?.content || [];
 
   const handleUpvote = () => {
@@ -96,7 +96,7 @@ export default function Home() {
             </Button>
 
             <span className="text-slate-400 text-sm">
-              Displaying <span className="text-white font-medium">{toolsPage?.totalElements || 0}</span> AI tools
+              Displaying <span className="text-white font-medium">{toolsPage?.page?.totalElements || 0}</span> AI tools
             </span>
           </div>
 
