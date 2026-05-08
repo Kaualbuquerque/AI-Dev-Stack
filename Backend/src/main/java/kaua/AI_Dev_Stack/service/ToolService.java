@@ -81,9 +81,10 @@ public class ToolService {
             String type,
             List<String> stack,
             String tag,
-            Boolean votedByMe) {
+            Boolean votedByMe,
+            String userEmail) {
 
-        Specification<Tool> spec = ToolSpecification.withFilters(search, pricing, type, stack, tag, votedByMe, currentUser);
+        Specification<Tool> spec = ToolSpecification.withFilters(search, pricing, type, stack, tag, votedByMe, currentUser, userEmail);
         Page<Tool> tools = toolRepository.findAll(spec, pageable);
 
         Set<UUID> votedToolIds = currentUser != null

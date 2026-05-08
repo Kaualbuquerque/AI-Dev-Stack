@@ -74,8 +74,9 @@ public class ToolController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) List<String> stack,
             @RequestParam(required = false) String tag,
-            @RequestParam(required = false) Boolean votedByMe) {
-        return ResponseEntity.ok(toolService.findAllApproved(pageable, user, search, pricing, type, stack, tag, votedByMe));
+            @RequestParam(required = false) Boolean votedByMe,
+            @RequestParam(required = false) String userEmail) {
+        return ResponseEntity.ok(toolService.findAllApproved(pageable, user, search, pricing, type, stack, tag, votedByMe, userEmail));
     }
 
     @GetMapping("/search")

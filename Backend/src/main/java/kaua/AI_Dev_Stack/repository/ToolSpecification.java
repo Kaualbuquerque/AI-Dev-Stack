@@ -20,7 +20,8 @@ public class ToolSpecification {
             List<String> stack,
             String tag,
             Boolean votedByMe,
-            User currentUser) {
+            User currentUser,
+            String userEmail) {
 
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -83,6 +84,10 @@ public class ToolSpecification {
                 subquery.select(upvoteRoot.get("tool").get("id"))
                         .where(cb.equal(upvoteRoot.get("user").get("id"), currentUser.getId()));
                 predicates.add(root.get("id").in(subquery));
+            }
+
+            if (userEmail != null && !userEmail.isBlank()) {
+                predicates.add(cb.equal(root.get("user").get("email"), userEmail));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
