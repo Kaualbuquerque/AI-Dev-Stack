@@ -21,6 +21,8 @@ export interface ToolFilters {
     stack?: string[];
     sort?: string;
     tag?: string;
+    votedByMe?: boolean;
+    userEmail?: string;
 }
 
 export interface SuggestToolForm {
