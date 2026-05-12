@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/Button";
 import Skeleton from "@/app/components/ui/Skeleton";
-import { Tools, toolsService } from "@/app/services/toolsService";
 import { createPageUrl } from "@/app/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowUp, Calendar, DollarSign, ExternalLink, Layers, Monitor, Share2, Sparkles, Tag } from "lucide-react";
@@ -12,10 +11,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/app/lib/utils";
-import { PricingType, pricingConfig } from "@/app/types/princing";
+import { PricingType, pricingConfig } from "@/app/types/pricing";
 import { useState } from "react";
-import { typeLabels } from "@/app/types/tool";
+import { Tools, typeLabels } from "@/app/types/tool";
 import { useUser } from "@/app/lib/UserContext";
+import { toolsService } from "@/app/services/toolsService";
 
 export default function ToolDetails() {
 

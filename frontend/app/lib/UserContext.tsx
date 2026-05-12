@@ -1,9 +1,9 @@
 "use client"
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
-import { User, UserContextType } from "../types/auth"
 import { tokenStorage } from "../api/client";
 import { userService } from "../services/userService";
+import { User, UserContextType } from "../types/user";
 
 const UserContext = createContext<UserContextType | null>(null);
 

@@ -1,10 +1,5 @@
 import { apiFetch } from '../api/client';
-
-export interface Tag {
-    id: string;
-    name: string;
-    usageCount: number;
-}
+import { Tag } from '../types/tag';
 
 export const tagService = {
     getAll: () => apiFetch<Tag[]>('/tags'),

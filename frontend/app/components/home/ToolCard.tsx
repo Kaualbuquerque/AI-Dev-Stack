@@ -1,5 +1,4 @@
 import { cn } from "@/app/lib/utils";
-import { Tools, toolsService } from "@/app/services/toolsService";
 import { createPageUrl } from "@/app/utils";
 import { motion } from "framer-motion";
 import { ArrowUp, ExternalLink, Sparkles, Tag } from "lucide-react";
@@ -7,8 +6,9 @@ import Link from "next/link";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useState } from "react";
-import { PricingType, pricingConfig } from "@/app/types/princing";
-import { typeIcons } from "@/app/types/tool";
+import { PricingType, pricingConfig } from "@/app/types/pricing";
+import { Tools, typeIcons } from "@/app/types/tool";
+import { toolsService } from "@/app/services/toolsService";
 
 
 interface ToolCardProps {

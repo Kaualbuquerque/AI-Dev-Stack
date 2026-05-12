@@ -1,71 +1,7 @@
 import { apiFetch } from "../api/client";
-import { User } from "../types/auth";
 import { FiltersResponse } from "../types/filter";
-import { PricingType } from "../types/princing";
-import { ToolType } from "../types/tool";
-
-export interface PaginatedResponse<T> {
-    content: T[];
-    page: {
-        totalPages: number;
-        totalElements: number;
-        number: number;
-        size: number;
-    };
-}
-
-export interface ToolFilters {
-    search?: string;
-    pricing?: string;
-    type?: string;
-    stack?: string[];
-    sort?: string;
-    tag?: string;
-    votedByMe?: boolean;
-    userEmail?: string;
-}
-
-export interface SuggestToolForm {
-    name: string;
-    description: string;
-    url: string;
-    thumbnailUrl: string;
-    pricingModel: PricingType;
-    toolType: ToolType;
-    tagIds: string[];
-    stacks: string[];
-}
-
-export interface Tools {
-    id: number;
-    name: string;
-    description: string;
-    url: string;
-    thumbnailUrl: string;
-    pricingModel: PricingType;
-    toolType: ToolType; // Novo campo integrado
-    stacks: string[];
-    tags: {
-        id: string;
-        name: string;
-        slug: string;
-        iconKey: string;
-    }[];
-    user: User;
-    isApproved: boolean; // Informações de status e destaque
-    featured: boolean;
-    upvotesCount: number;    // Contador de Upvotes (em vez de carregar a lista toda de objetos Upvote)
-    votedByMe: boolean;
-    userEmail: string;
-    createdAt: string; // Datas no JSON costumam vir como string (ISO 8601)
-}
-
-export interface tag {
-    id: string,
-    name: string,
-    slug: string,
-    iconKey: string
-}
+import { Tag } from "../types/tag";
+import { PaginatedResponse, SuggestToolForm, ToolFilters, Tools } from "../types/tool";
 
 export const toolsService = {
     getAll: (page = 0, size = 12, filters?: ToolFilters) => {
@@ -78,7 +14,7 @@ export const toolsService = {
         if (filters?.type) params.set('type', filters.type);
         if (filters?.stack?.length) {
             filters.stack.forEach(s => params.append('stack', s));
-        }
+        };
         if (filters?.tag) params.set('tag', filters.tag);
         if (filters?.sort) {
             switch (filters.sort) {
@@ -92,7 +28,9 @@ export const toolsService = {
                     params.set('sort', 'name,asc');
                     break;
             }
-        }
+        };
+        if (filters?.votedByMe) params.set('votedByMe', 'true');
+        if (filters?.userEmail) params.set('userEmail', filters.userEmail);
         return apiFetch<PaginatedResponse<Tools>>(`/tools?${params.toString()}`);
     },
 
@@ -115,7 +53,7 @@ export const toolsService = {
         apiFetch<Tools>(`/tools/search?name=${encodeURIComponent(name)}`),
 
     getTags: () =>
-        apiFetch<tag[]>('/tags'),
+        apiFetch<Tag[]>('/tags'),
 
     getPending: (page = 0, size = 12) =>
         apiFetch<PaginatedResponse<Tools>>(`/tools/pending?page=${page}&size=${size}`),

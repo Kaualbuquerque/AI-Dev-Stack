@@ -4,15 +4,15 @@ import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUp, Calendar, LogOut, Mail, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/app/components/ui/Badge";
-import { Tools, toolsService } from "@/app/services/toolsService";
 import { Button } from "@/app/components/ui/Button";
 import { createPageUrl } from "@/app/utils";
 import { cn } from "@/app/lib/utils";
 import { useUser } from "@/app/lib/UserContext";
 import { useRequireAuth } from "@/app/hooks/useRequireAuth";
+import { toolsService } from "@/app/services/toolsService";
 
 export default function Profile() {
 
@@ -27,16 +27,22 @@ export default function Profile() {
     // Fetch ferramentas votadas
     const { data: upvotedToolsPage } = useQuery({
         queryKey: ["tools", "votedByMe", upvotedPage],
-        queryFn: () => toolsService.getAll(upvotedPage, PAGE_SIZE, { votedByMe: true }),
+        queryFn: () => {
+            console.log('Fetching voted tools for:', user?.email);
+            return toolsService.getAll(upvotedPage, PAGE_SIZE, { votedByMe: true });
+        },
         enabled: !!user,
     });
 
     // Fetch sugestões do usuário
     const { data: suggestionsToolsPage } = useQuery({
         queryKey: ["tools", "suggestions", suggestionsPage],
-        queryFn: () => toolsService.getAll(suggestionsPage, PAGE_SIZE, {
-            userEmail: user?.email
-        }),
+        queryFn: () => {
+            console.log('Fetching suggestions for:', user?.email);
+            return toolsService.getAll(suggestionsPage, PAGE_SIZE, {
+                userEmail: user?.email
+            });
+        },
         enabled: !!user,
     });
 

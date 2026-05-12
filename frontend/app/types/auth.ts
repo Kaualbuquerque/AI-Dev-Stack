@@ -1,15 +1,10 @@
-
-export interface User {
-    email: string,
-    username: string,
-    createdAt: string
-    role: 'ADMIN' | 'USER'
-    upvotedResourcesId: number[]
+export interface LoginRequest {
+    email: string;
+    password: string;
 }
 
-export interface UserContextType {
-    user: User | null;
-    isLoading: boolean;
-    setUser: (user: User | null) => void;
-    clearUser: () => void;
+export interface LoginResponse {
+    token: string;
+    email: string;
+    username: string;
 }

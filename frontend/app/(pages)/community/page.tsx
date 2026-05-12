@@ -3,11 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowUp, Award, Crown, Medal, Sparkle, TrendingUp, Trophy, Users } from "lucide-react";
-import { Tools, toolsService } from "../../services/toolsService";
 import { cn } from "../../lib/utils";
 import Link from "next/link";
 import { createPageUrl } from "../../utils";
 import { Badge } from "../../components/ui/Badge";
+import { toolsService } from "@/app/services/toolsService";
 
 export default function Community() {
 

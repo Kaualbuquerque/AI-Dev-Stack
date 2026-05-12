@@ -1,11 +1,5 @@
 import { apiFetch } from "../api/client";
-import { User } from "../types/auth";
-
-export interface UserRegisterRequest {
-    email: string;
-    username: string;
-    password: string;
-}
+import { User, UserRegisterRequest } from "../types/user";
 
 export const userService = {
     getUser: () => apiFetch<User>('/users/me'),

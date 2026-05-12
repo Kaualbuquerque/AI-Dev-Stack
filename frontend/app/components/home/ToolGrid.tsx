@@ -1,8 +1,9 @@
-import { Tools } from "@/app/services/toolsService";
+
 import ToolCardSkeleton from "./ToolCardSkeleton";
 import { motion } from "framer-motion";
 import { Package } from "lucide-react";
 import ToolCard from "./ToolCard";
+import { Tools } from "@/app/types/tool";
 
 interface ToolGridProps {
     tools: Tools[];

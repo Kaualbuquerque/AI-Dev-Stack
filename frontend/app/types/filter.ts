@@ -1,5 +1,5 @@
 import { ElementType } from "react";
-import { PricingType } from "./princing";
+import { PricingType } from "./pricing";
 import { ToolType } from "./tool";
 
 export interface FiltersData {

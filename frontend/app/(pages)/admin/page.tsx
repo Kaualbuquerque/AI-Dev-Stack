@@ -3,8 +3,7 @@
 import { motion } from "framer-motion";
 import { useRequireAuth } from "@/app/hooks/useRequireAuth"
 import { useUser } from "@/app/lib/UserContext";
-import { Tools, toolsService } from "@/app/services/toolsService";
-import { PricingType, pricingConfig } from "@/app/types/princing";
+import { PricingType, pricingConfig } from "@/app/types/pricing";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ExternalLink, Pencil, Shield, Star, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,7 +17,8 @@ import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/Select";
 import { Textarea } from "@/app/components/ui/Textarea";
-import { ToolType } from "@/app/types/tool";
+import { ToolType, Tools } from "@/app/types/tool";
+import { toolsService } from "@/app/services/toolsService";
 
 type Tab = 'pending' | 'approved';
 

@@ -26,6 +26,10 @@ public class ToolSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (userEmail == null || userEmail.isBlank()) {
+                predicates.add(cb.isTrue(root.get("isApproved")));
+            }
+
             // Apenas ferramentas aprovadas
             predicates.add(cb.isTrue(root.get("isApproved")));
 

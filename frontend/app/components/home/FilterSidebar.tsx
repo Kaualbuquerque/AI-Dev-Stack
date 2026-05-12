@@ -8,7 +8,7 @@ import { FiltersData } from "@/app/types/filter";
 import { useQuery } from "@tanstack/react-query";
 import { toolsService } from "@/app/services/toolsService";
 import Skeleton from "../ui/Skeleton";
-import { PricingType, pricingConfig } from "@/app/types/princing";
+import { PricingType, pricingConfig } from "@/app/types/pricing";
 
 interface FilterSidebarProps {
     filters: FiltersData,
