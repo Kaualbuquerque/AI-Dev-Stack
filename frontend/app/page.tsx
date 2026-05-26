@@ -68,6 +68,7 @@ export default function Home() {
     filters.type.length +
     (activeTag ? 1 : 0);
 
+
   return (
     <div className="min-h-screen">
       <HeroSection onTagClick={handleTagClick} activeTag={activeTag} />
