@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🖥️ AI-Dev Stack — Frontend
 
-## Getting Started
+Next.js 14 application for the AI-Dev Stack platform.
 
-First, run the development server:
+<!-- 📸 IMAGE: Screenshot of the Home page with tool grid, filter sidebar and search bar -->
+![Home page Screenshot](./public/images/Home.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🛠️ Tech Stack
+
+- **Next.js 14** — App Router, Server and Client Components
+- **TypeScript** — Type safety throughout the application
+- **Tailwind CSS v4** — Utility-first styling with custom theme
+- **TanStack Query** — Data fetching, caching and state management
+- **Framer Motion** — Animations and transitions
+- **Shadcn/UI** — Accessible component library built on Radix UI
+- **Sonner** — Toast notifications
+
+## 📁 Project Structure
+
+```
+app/
+├── (pages)/
+│   ├── profile/           # User profile page
+│   ├── community/         # Community leaderboard
+│   ├── suggest-tool/      # Tool suggestion form
+│   ├── tool-details/      # Tool detail page
+│   ├── admin/             # Admin panel
+│   ├── sign-in/           # Login page
+│   └── sign-up/           # Register page
+├── components/
+│   ├── home/              # Home-specific components
+│   └── ui/                # Reusable UI components
+├── services/              # API service functions
+├── types/                 # TypeScript interfaces
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utilities and context
+└── api/                   # API client (apiFetch)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Page | Description |
+|------|-------------|
+| **Home** | Tool directory with filters, search and pagination |
+| **Tool Details** | Full tool info with upvote and share |
+| **Community** | Leaderboard with top 10 and trending tools |
+| **Profile** | User upvoted tools and suggestions |
+| **Suggest Tool** | Form to submit a new AI tool |
+| **Admin** | Approve, feature, edit and delete tools |
+| **Sign In / Sign Up** | JWT authentication pages |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+<!-- 📸 IMAGE: Screenshot of the Sign In page -->
+![Sing in page Screenshot](./public/images/Sing-in.png)
+<!-- 📸 IMAGE: Screenshot of the Admin panel with Pending and Approved tabs -->
+![Admin panel Screenshot](./public/images/Admin.png)
+<!-- 📸 IMAGE: Screenshot of the Profile page showing upvoted tools and suggestions -->
+![Profile page Screenshot](./public/images/Profile.png.png)
 
-## Learn More
+## ⚙️ Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env.local` file in the `Frontend/` directory:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8081
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### Prerequisites
+- Node.js 18+
+- Backend API running (see [Backend README](../Backend/README.md))
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Navigate to the frontend directory
+cd Frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The application will be available at `http://localhost:3000`.
+
+### Build for production
+
+```bash
+npm run build
+npm start
+```
