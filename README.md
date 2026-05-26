@@ -3,7 +3,7 @@
 > A curated directory of AI tools for developers — built to explore, vote and discover the best AI-powered tools for your workflow.
 
 <!-- 📸 IMAGE: Hero screenshot showing the Home page with tool cards, filters and search bar -->
-![Home page Screenshot](./Frontend/public/images/Home.png)
+![Home page Screenshot](./frontend/public/images/Home.png)
 
 ## 📋 About
 
@@ -22,7 +22,7 @@ The platform includes a complete admin panel for tool moderation, ensuring conte
 - **🛡️ Admin Panel** — Approve, feature, edit and delete tool suggestions
 
 <!-- 📸 IMAGE: Screenshot showing the Community page leaderboard -->
-![Community page Screenshot](./Frontend/public/images/Community.png)
+![Community page Screenshot](./frontend/public/images/Community.png)
 
 ## 🛠️ Tech Stack
 
@@ -45,7 +45,7 @@ The platform includes a complete admin panel for tool moderation, ensuring conte
 
 See the individual READMEs for setup instructions:
 
-- [Frontend README](./Frontend/README.md)
+- [Frontend README](./frontend/README.md)
 - [Backend README](./Backend/README.md)
 
 ## 📁 Project Structure
